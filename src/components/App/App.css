@@ -1,0 +1,25 @@
+.App { }
+
+.App__NavButton {
+  position: fixed;
+  z-index: 2;
+  top: 15px;
+  width: 1.5em;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+  font-size: 3em;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border-radius: 30px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.App__NavButton--Prev {
+  left: 15px;
+}
+
+.App__NavButton--Next {
+  right: 15px;
+}
