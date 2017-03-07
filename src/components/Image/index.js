@@ -3,10 +3,10 @@ import { uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
 import './Image.css';
 
 const drawState = {
-  default:  0,
-  drawing:  1,
-  moving:   2,
-  resizing: 3,
+  default:  'default',
+  drawing:  'drawing',
+  moving:   'moving',
+  resizing: 'resizing',
 };
 
 export default class Image extends Component {
@@ -230,7 +230,7 @@ export default class Image extends Component {
     this.saveBoxes(boxes);
   }
 
-  renderBox(dimensions, index) {
+  renderBox(dimensions, index = null, additionalClassName = '') {
     let boxStyle = {};
 
     // we handle drawing starting at any corner of the rectangle (box) and
@@ -252,7 +252,7 @@ export default class Image extends Component {
     }
 
     return (
-      <div className={'Image__Box ' + (index === this.editingBoxIndex ? 'Image__Box--Moving' : '')}
+      <div className={`Image__Box ${additionalClassName} ` + (index === this.editingBoxIndex ? `Image__Box--${this.drawState}` : '')}
            key={index}
            onMouseDown={e => this.onMouseDownOnBox(e, index)}
            onMouseMove={e => this.onMouseMoveOnBox(e)}
@@ -260,7 +260,7 @@ export default class Image extends Component {
            style={boxStyle}
       >
         <div className="Image__Box__DeleteButton"
-          onClick={e => this.deleteBoxAtIndex(index)}
+             onClick={e => this.deleteBoxAtIndex(index)}
         />
 
         <div className="Image__Box__DragArea"
@@ -282,7 +282,7 @@ export default class Image extends Component {
              draggable="false"
         />
 
-        {this.state.newBoxDimensions !== null ? this.renderBox(this.state.newBoxDimensions) : ''}
+        {this.state.newBoxDimensions !== null ? this.renderBox(this.state.newBoxDimensions, null, "Image___Box--Bordered") : ''}
 
         {this.state.boxes.map((dimensions, index) => this.renderBox(dimensions, index))}
       </div>

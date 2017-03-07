@@ -37,35 +37,87 @@
 
 .Image__Box {
   position: absolute;
-  border: 2px solid blue;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+.Image___Box--Bordered {
+  border: 1px solid #60E4FF;
 }
 .Image__Box:hover,
-.Image__Box--Moving {
-  border-color: red;
+.Image__Box--Editing {
+  border-color: #60E4FF;
   cursor: move;
 }
 
 .Image__Box__DragArea {
   position: absolute;
+  display: none;
+  justify-content: center;
+  align-items: center;
   z-index: 2;
-  width: 20px;
-  height: 20px;
-  bottom: -2px;
-  right: -2px;
-  background-color: orange;
+  bottom: -1px;
+  right: -1px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 20px 20px;
+  color: #042E5A;
+  border-color: transparent transparent #007bff transparent;
 }
+.Image__Box:hover .Image__Box__DragArea,
+.Image__Box--resizing .Image__Box__DragArea {
+  display: flex;
+}
+.Image__Box--moving .Image__Box__DragArea {
+  display: none !important;
+}
+
 .Image__Box__DragArea:hover {
-  background-color: green;
-  cursor: nwse-resize;;
+  cursor: nwse-resize;
+}
+.Image__Box__DragArea::before {
+  content: "…";
+  display: block;
+  position: absolute;
+  transform: rotate(-45deg);
+  top: 4px;
+  left: -14px;
+  font-size: 11px;
 }
 
 .Image__Box__DeleteButton {
+  box-sizing: border-box;
   position: absolute;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 1px 1px 2px 2px;
   z-index: 3;
-  width: 20px;
-  height: 20px;
-  top: 0;
-  right: 0;
-  background-color: red;
+  width: 17px;
+  height: 17px;
+  top: -5px;
+  right: -5px;
+  background-color: #FC4537;
+  color: #3D1511;
   cursor: pointer;
+  text-align: center;
+  border: 1px solid #3D1511;
+  border-radius: 50%;
+}
+.Image__Box:hover .Image__Box__DeleteButton {
+  display: flex;
+}
+.Image__Box--moving .Image__Box__DeleteButton,
+.Image__Box--resizing .Image__Box__DeleteButton {
+  display: none !important;
+}
+.Image__Box__DeleteButton:hover {
+  background-color: #FC383B;
+  border-color: #FEC4BD;
+  color: #FEC4BD;
+}
+.Image__Box__DeleteButton:before {
+  content: "✕";
+  font-weight: bold;
+  font-size: 10px;
 }
