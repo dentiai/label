@@ -175,9 +175,11 @@ export default class Image extends Component {
 
     this.editingBoxIndex = null;
 
-    this.setState();
+    this.forceUpdate();
 
     this.drawState = drawState.default;
+
+    this.saveBoxes(this.state.boxes);
   }
 
   onMouseDownOnResizer(event, index) {
@@ -201,9 +203,11 @@ export default class Image extends Component {
 
     this.editingBoxIndex = null;
 
-    this.setState();
+    this.forceUpdate();
 
     this.drawState = drawState.default;
+
+    this.saveBoxes(this.state.boxes);
   }
 
 
