@@ -1,75 +1,94 @@
 import React, { Component } from 'react';
 import './Image.css';
 
-let currentBox = null;
-let isDrawing = false;
-
 export default class Image extends Component {
 
   constructor(props) {
     super(props);
 
+    this.isDrawing = false;
+
+    this.imageElement = null;
+
     this.state = {
       boxes: [],
-      currentBoxWidth: 0,
-      currentBoxHeight: 0,
+      newBoxDimensions: null,
     };
   }
 
   onMouseDown(event) {
     event.preventDefault();
 
-    const parentBoundingRect = event.target.getBoundingClientRect();
+    const parentBoundingRect = this.imageElement.getBoundingClientRect();
 
     let startX = event.nativeEvent.pageX - parentBoundingRect.left;
     let startY = event.nativeEvent.pageY - parentBoundingRect.top;
     let endX = startX;
     let endY = startY;
 
-    currentBox = { startX, startY, endX, endY };
+    const newBoxDimensions = { startX, startY, endX, endY };
 
-    const boxes = this.state.boxes;
-    boxes.push(currentBox);
-    this.setState({ boxes });
+    this.setState({ newBoxDimensions });
 
-    isDrawing = true;
+    this.isDrawing = true;
   }
 
   onMouseMove(event) {
     event.preventDefault();
 
-    if (!isDrawing) {
+    if (!this.isDrawing) {
       return;
     }
 
-    const parentBoundingRect = event.target.getBoundingClientRect();
+    const parentBoundingRect = this.imageElement.getBoundingClientRect();
 
     const endX = event.nativeEvent.pageX - parentBoundingRect.left;
     const endY = event.nativeEvent.pageY - parentBoundingRect.top;
 
-    const box = this.state.boxes[0];
-    box.endX = endX;
-    box.endY = endY;
-    this.setState({ boxes: this.state.boxes.splice(0, 1, box) });
+    const newBoxDimensions = this.state.newBoxDimensions;
+
+    newBoxDimensions.endX = endX;
+    newBoxDimensions.endY = endY;
+
+    this.setState({ newBoxDimensions });
   }
 
   onMouseUp(event) {
     event.preventDefault();
 
-    isDrawing = false;
+    const boxes = this.state.boxes;
+    boxes.push(this.state.newBoxDimensions);
+    this.setState({ boxes, newBoxDimensions: null });
+
+    this.isDrawing = false;
   }
 
   renderBox(dimensions, index) {
+    let boxStyle = {};
+
+    // we handle drawing starting at any corner of the rectangle (box) and
+    // convert the x,y dimensions to CSS properties
+    if (dimensions.startX <= dimensions.endX) {
+      boxStyle.left = dimensions.startX;
+      boxStyle.width = dimensions.endX - dimensions.startX;
+    } else {
+      boxStyle.left = dimensions.endX;
+      boxStyle.width = dimensions.startX - dimensions.endX;
+    }
+
+    if (dimensions.startY <= dimensions.endY) {
+      boxStyle.top = dimensions.startY;
+      boxStyle.height = dimensions.endY - dimensions.startY;
+    } else {
+      boxStyle.top = dimensions.endY;
+      boxStyle.height = dimensions.startY - dimensions.endY;
+    }
+
     return (
       <div className="Image__Box"
            key={index}
-           onMouseUp={(e) => this.onMouseUp(e)}
-           style={{
-              top: dimensions.startY,
-              left: dimensions.startX,
-              width: dimensions.endX - dimensions.startX,
-              height: dimensions.endY - dimensions.startY,
-      }} />
+           style={boxStyle}
+      />
     );
   }
 
@@ -79,10 +98,11 @@ export default class Image extends Component {
         <img
              role="presentation"
              src={this.props.url}
-             onMouseDown={(e) => this.onMouseDown(e)}
-             onMouseMove={(e) => this.onMouseMove(e)}
-             onMouseUp={(e) => this.onMouseUp(e)}
+             ref={(img) => this.imageElement = img}
         />
+
+        {this.state.newBoxDimensions !== null ? this.renderBox(this.state.newBoxDimensions) : ''}
+
         {this.state.boxes.map((dimensions, index) => this.renderBox(dimensions, index))}
       </div>
     );
@@ -99,7 +119,11 @@ export default class Image extends Component {
 
   render() {
     return (
-      <div className="Image">
+      <div className="Image"
+           onMouseDown={(e) => this.onMouseDown(e)}
+           onMouseMove={(e) => this.onMouseMove(e)}
+           onMouseUp={(e) => this.onMouseUp(e)}
+      >
         { this.props.error ? this.renderError() : this.renderImage() }
       </div>
     );
