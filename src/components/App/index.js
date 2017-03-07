@@ -24,7 +24,6 @@ export default class App extends Component {
     });
   }
 
-
   /**
    * Check the URL given to make sure it loads without error
    *

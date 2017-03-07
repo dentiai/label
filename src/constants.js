@@ -1,1 +1,1 @@
-export const S3_BUCKET_URL = 'http://d-pan1.s3.amazonaws.com';
+export const S3_BUCKET_URL = 'https://s3-eu-west-1.amazonaws.com/d-pan1';

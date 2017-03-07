@@ -1,11 +1,17 @@
 .Image {
-  position: absolute;
+  position: relative;
   z-index: 1;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  text-align: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.Image__Image {
+  position: absolute;
+  display: block;
+  top: 50%;
+  left: 50%;
+  transform:  translate(-50%, -50%);
+  user-select: none;
 }
 
 .Image__Error {
@@ -15,6 +21,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 10px;
+  text-align: center;
   color: #F43A32;
   background-color: #171717;
   border: 1px solid #0C0C0C;
@@ -25,4 +32,9 @@
   display: block;
   font-style: italic;
   word-wrap: break-word;
+}
+
+.Image__Box {
+  position: absolute;
+  border: 1px solid blue;
 }
