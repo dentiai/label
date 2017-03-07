@@ -71,11 +71,15 @@ export default class Image extends Component {
   }
 
   onMouseMoveOnImage(event) {
+    if (this.props.error) {
+      return;
+    }
+
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
     switch (this.drawState) {
       case drawState.drawing:
         const newBoxDimensions = this.state.newBoxDimensions;
-
-        const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
         newBoxDimensions.endX = mouseCoordinates.x;
         newBoxDimensions.endY = mouseCoordinates.y;
@@ -87,10 +91,8 @@ export default class Image extends Component {
       case drawState.resizing:
         const box = this.state.boxes[this.editingBoxIndex];
 
-        const _mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
-
-        box.endX = _mouseCoordinates.x;
-        box.endY = _mouseCoordinates.y;
+        box.endX = mouseCoordinates.x;
+        box.endY = mouseCoordinates.y;
 
         const boxes = this.state.boxes;
         boxes[this.editingBoxIndex] = box;
@@ -210,7 +212,6 @@ export default class Image extends Component {
     this.saveBoxes(this.state.boxes);
   }
 
-
   getImageMouseCoordinatesFromMouseEvent(event) {
     const parentBoundingRect = this.imageElement.getBoundingClientRect();
 
@@ -218,6 +219,15 @@ export default class Image extends Component {
       x: event.nativeEvent.pageX - parentBoundingRect.left - window.scrollX,
       y: event.nativeEvent.pageY - parentBoundingRect.top - window.scrollY,
     };
+  }
+
+  deleteBoxAtIndex(index) {
+    const boxes = this.state.boxes;
+    boxes.splice(index, 1);
+
+    this.setState({ boxes });
+
+    this.saveBoxes(boxes);
   }
 
   renderBox(dimensions, index) {
@@ -249,6 +259,10 @@ export default class Image extends Component {
            onMouseUp={e => this.onMouseUpFromBox(e)}
            style={boxStyle}
       >
+        <div className="Image__Box__DeleteButton"
+          onClick={e => this.deleteBoxAtIndex(index)}
+        />
+
         <div className="Image__Box__DragArea"
              onMouseDown={e => this.onMouseDownOnResizer(e, index)}
              onMouseMove={e => this.onMouseMoveOnImage(e)}
