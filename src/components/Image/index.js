@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
 import './Image.css';
 
 export default class Image extends Component {
@@ -16,15 +17,41 @@ export default class Image extends Component {
     };
   }
 
+  componentDidMount() {
+    this.loadBoxes((boxes) => this.setState({ boxes }));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ boxes: [] });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.url !== prevProps.url) {
+      this.loadBoxes((boxes) => this.setState({ boxes }));
+    }
+  }
+
+  saveBoxes(boxes) {
+    uploadJSONToBucket(this.getJSONFileName(), boxes);
+  }
+
+  loadBoxes(onLoad) {
+    downloadJSONFromBucket(this.getJSONFileName(), onLoad);
+  }
+
+  getJSONFileName() {
+    return this.props.url.substring(this.props.url.lastIndexOf('/')+1) + ".json";
+  }
+
   onMouseDown(event) {
     event.preventDefault();
 
-    const parentBoundingRect = this.imageElement.getBoundingClientRect();
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
-    let startX = event.nativeEvent.pageX - parentBoundingRect.left;
-    let startY = event.nativeEvent.pageY - parentBoundingRect.top;
-    let endX = startX;
-    let endY = startY;
+    const startX = mouseCoordinates.x;
+    const startY = mouseCoordinates.y;
+    const endX = startX;
+    const endY = startY;
 
     const newBoxDimensions = { startX, startY, endX, endY };
 
@@ -40,15 +67,12 @@ export default class Image extends Component {
       return;
     }
 
-    const parentBoundingRect = this.imageElement.getBoundingClientRect();
-
-    const endX = event.nativeEvent.pageX - parentBoundingRect.left;
-    const endY = event.nativeEvent.pageY - parentBoundingRect.top;
-
     const newBoxDimensions = this.state.newBoxDimensions;
 
-    newBoxDimensions.endX = endX;
-    newBoxDimensions.endY = endY;
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
+    newBoxDimensions.endX = mouseCoordinates.x;
+    newBoxDimensions.endY = mouseCoordinates.y;
 
     this.setState({ newBoxDimensions });
   }
@@ -61,6 +85,17 @@ export default class Image extends Component {
     this.setState({ boxes, newBoxDimensions: null });
 
     this.isDrawing = false;
+
+    this.saveBoxes(boxes);
+  }
+
+  getImageMouseCoordinatesFromMouseEvent(event) {
+    const parentBoundingRect = this.imageElement.getBoundingClientRect();
+
+    return {
+      x: event.nativeEvent.pageX - parentBoundingRect.left - window.scrollX,
+      y: event.nativeEvent.pageY - parentBoundingRect.top - window.scrollY,
+    };
   }
 
   renderBox(dimensions, index) {
@@ -120,9 +155,9 @@ export default class Image extends Component {
   render() {
     return (
       <div className="Image"
-           onMouseDown={(e) => this.onMouseDown(e)}
-           onMouseMove={(e) => this.onMouseMove(e)}
-           onMouseUp={(e) => this.onMouseUp(e)}
+           onMouseDown={e => this.onMouseDown(e)}
+           onMouseMove={e => this.onMouseMove(e)}
+           onMouseUp={e => this.onMouseUp(e)}
       >
         { this.props.error ? this.renderError() : this.renderImage() }
       </div>

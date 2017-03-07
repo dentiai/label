@@ -16,7 +16,7 @@ const extractImageListFromBucket = (bucket) => {
     const fileName = object.Key[0];
 
     // filter out everything except web images
-    if (/\.(gif|jpg|jpeg|png|bmp)/.test(fileName)) {
+    if (/\.(gif|jpg|jpeg|png|bmp)$/.test(fileName)) {
       list.push(`${S3_BUCKET_URL}/${fileName}`);
     }
   });
@@ -30,7 +30,7 @@ const extractImageListFromBucket = (bucket) => {
  * @param {function} onListReady(list) called when the list (array) is ready
  * @return {void}
  */
-export default (onListReady) => {
+const getBucketImageList = (onListReady) => {
   axios.get(`${S3_BUCKET_URL}/?list-type=2`)
     .then((response) => {
       parseString(response.data, (error, result) => {
@@ -43,3 +43,5 @@ export default (onListReady) => {
     })
     .catch((error) => alert(error));
 };
+
+export default getBucketImageList;
