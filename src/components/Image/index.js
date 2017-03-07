@@ -2,14 +2,26 @@ import React, { Component } from 'react';
 import { uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
 import './Image.css';
 
+const drawState = {
+  default:  0,
+  drawing:  1,
+  moving:   2,
+  resizing: 3,
+};
+
 export default class Image extends Component {
 
   constructor(props) {
     super(props);
 
-    this.isDrawing = false;
-
     this.imageElement = null;
+
+    this.drawState = drawState.default;
+
+    this.editingBoxIndex = null;
+
+    this.mouseBoxDeltaX = 0;
+    this.mouseBoxDeltaY = 0;
 
     this.state = {
       boxes: [],
@@ -43,9 +55,7 @@ export default class Image extends Component {
     return this.props.url.substring(this.props.url.lastIndexOf('/')+1) + ".json";
   }
 
-  onMouseDown(event) {
-    event.preventDefault();
-
+  onMouseDownOnImage(event) {
     const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
     const startX = mouseCoordinates.x;
@@ -57,37 +67,145 @@ export default class Image extends Component {
 
     this.setState({ newBoxDimensions });
 
-    this.isDrawing = true;
+    this.drawState = drawState.drawing;
   }
 
-  onMouseMove(event) {
-    event.preventDefault();
+  onMouseMoveOnImage(event) {
+    switch (this.drawState) {
+      case drawState.drawing:
+        const newBoxDimensions = this.state.newBoxDimensions;
 
-    if (!this.isDrawing) {
+        const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
+        newBoxDimensions.endX = mouseCoordinates.x;
+        newBoxDimensions.endY = mouseCoordinates.y;
+
+        this.setState({ newBoxDimensions });
+
+        return;
+
+      case drawState.resizing:
+        const box = this.state.boxes[this.editingBoxIndex];
+
+        const _mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
+        box.endX = _mouseCoordinates.x;
+        box.endY = _mouseCoordinates.y;
+
+        const boxes = this.state.boxes;
+        boxes[this.editingBoxIndex] = box;
+
+        this.setState({ boxes });
+
+        return;
+
+      default: return;
+    }
+  }
+
+  onMouseUpFromImage(event) {
+    if (this.drawState !== drawState.drawing) {
       return;
     }
-
-    const newBoxDimensions = this.state.newBoxDimensions;
-
-    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
-
-    newBoxDimensions.endX = mouseCoordinates.x;
-    newBoxDimensions.endY = mouseCoordinates.y;
-
-    this.setState({ newBoxDimensions });
-  }
-
-  onMouseUp(event) {
-    event.preventDefault();
 
     const boxes = this.state.boxes;
     boxes.push(this.state.newBoxDimensions);
     this.setState({ boxes, newBoxDimensions: null });
 
-    this.isDrawing = false;
+    this.drawState = drawState.default;
 
     this.saveBoxes(boxes);
   }
+
+  onMouseDownOnBox(event, boxIndex) {
+    if (this.drawState !== drawState.default) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    if (this.editingBoxIndex !== null) {
+      return;
+    }
+
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
+    const box = this.state.boxes[boxIndex];
+
+    this.mouseBoxDeltaX = mouseCoordinates.x - box.startX;
+    this.mouseBoxDeltaY = mouseCoordinates.y - box.startY;
+
+    this.editingBoxIndex = boxIndex;
+
+    this.drawState = drawState.moving;
+  }
+
+  onMouseMoveOnBox(event) {
+    if (this.drawState !== drawState.moving) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    const box = this.state.boxes[this.editingBoxIndex];
+
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+
+    const startX = mouseCoordinates.x - this.mouseBoxDeltaX;
+    const startY = mouseCoordinates.y - this.mouseBoxDeltaY;
+    const endX = startX + (box.endX - box.startX);
+    const endY = startY + (box.endY - box.startY);
+
+    const boxes = this.state.boxes;
+    boxes[this.editingBoxIndex] = { startX, startY, endX, endY };
+    this.setState({ boxes });
+  }
+
+  onMouseUpFromBox(event) {
+    if (this.drawState !== drawState.moving) {
+      return;
+    }
+
+    if (this.isMovingBox) {
+      event.stopPropagation();
+    }
+
+    this.mouseBoxDeltaX = 0;
+    this.mouseBoxDeltaY = 0;
+
+    this.editingBoxIndex = null;
+
+    this.setState();
+
+    this.drawState = drawState.default;
+  }
+
+  onMouseDownOnResizer(event, index) {
+    if(this.drawState !== drawState.default) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    this.editingBoxIndex = index;
+
+    this.drawState = drawState.resizing;
+  }
+
+  onMouseUpFromResizer(event) {
+    if (this.drawState !== drawState.resizing) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    this.editingBoxIndex = null;
+
+    this.setState();
+
+    this.drawState = drawState.default;
+  }
+
 
   getImageMouseCoordinatesFromMouseEvent(event) {
     const parentBoundingRect = this.imageElement.getBoundingClientRect();
@@ -120,10 +238,19 @@ export default class Image extends Component {
     }
 
     return (
-      <div className="Image__Box"
+      <div className={'Image__Box ' + (index === this.editingBoxIndex ? 'Image__Box--Moving' : '')}
            key={index}
+           onMouseDown={e => this.onMouseDownOnBox(e, index)}
+           onMouseMove={e => this.onMouseMoveOnBox(e)}
+           onMouseUp={e => this.onMouseUpFromBox(e)}
            style={boxStyle}
-      />
+      >
+        <div className="Image__Box__DragArea"
+             onMouseDown={e => this.onMouseDownOnResizer(e, index)}
+             onMouseMove={e => this.onMouseMoveOnImage(e)}
+             onMouseUp={e => this.onMouseUpFromResizer(e)}
+        />
+      </div>
     );
   }
 
@@ -134,6 +261,7 @@ export default class Image extends Component {
              role="presentation"
              src={this.props.url}
              ref={(img) => this.imageElement = img}
+             draggable="false"
         />
 
         {this.state.newBoxDimensions !== null ? this.renderBox(this.state.newBoxDimensions) : ''}
@@ -155,9 +283,9 @@ export default class Image extends Component {
   render() {
     return (
       <div className="Image"
-           onMouseDown={e => this.onMouseDown(e)}
-           onMouseMove={e => this.onMouseMove(e)}
-           onMouseUp={e => this.onMouseUp(e)}
+           onMouseDown={e => this.onMouseDownOnImage(e)}
+           onMouseMove={e => this.onMouseMoveOnImage(e)}
+           onMouseUp={e => this.onMouseUpFromImage(e)}
       >
         { this.props.error ? this.renderError() : this.renderImage() }
       </div>

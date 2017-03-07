@@ -12,6 +12,7 @@
   left: 50%;
   transform:  translate(-50%, -50%);
   user-select: none;
+  cursor: crosshair;
 }
 
 .Image__Error {
@@ -36,5 +37,23 @@
 
 .Image__Box {
   position: absolute;
-  border: 1px solid blue;
+  border: 2px solid blue;
+}
+.Image__Box:hover,
+.Image__Box--Moving {
+  border-color: red;
+  cursor: move;
+}
+
+.Image__Box__DragArea {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: -2px;
+  right: -2px;
+  background-color: orange;
+}
+.Image__Box__DragArea:hover {
+  background-color: green;
+  cursor: nwse-resize;;
 }
