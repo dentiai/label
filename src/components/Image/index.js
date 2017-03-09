@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
+import Labels from '../Labels';
 import './Image.css';
 
 const drawState = {
@@ -30,7 +31,7 @@ export default class Image extends Component {
   }
 
   componentDidMount() {
-    this.loadBoxes((boxes) => this.setState({ boxes }));
+    this.loadBoxes(boxes => this.setState({ boxes }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,12 +40,23 @@ export default class Image extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.url !== prevProps.url) {
-      this.loadBoxes((boxes) => this.setState({ boxes }));
+      this.loadBoxes(boxes => this.setState({ boxes }));
     }
   }
 
   saveBoxes(boxes) {
+    for (let i = 0; i < boxes.length; i++) {
+      boxes[i].labels = boxes[i].labels || this.state.boxes[i].labels;
+    }
+
     uploadJSONToBucket(this.getJSONFileName(), boxes);
+  }
+
+  onLabelsChangedForBoxAtIndex(index, labels) {
+    const boxes = this.state.boxes;
+    boxes[index].labels = labels;
+
+    this.saveBoxes(boxes);
   }
 
   loadBoxes(onLoad) {
@@ -168,9 +180,7 @@ export default class Image extends Component {
       return;
     }
 
-    if (this.isMovingBox) {
-      event.stopPropagation();
-    }
+    event.stopPropagation();
 
     this.mouseBoxDeltaX = 0;
     this.mouseBoxDeltaY = 0;
@@ -213,11 +223,11 @@ export default class Image extends Component {
   }
 
   getImageMouseCoordinatesFromMouseEvent(event) {
-    const parentBoundingRect = this.imageElement.getBoundingClientRect();
+    const imageBoundingRect = this.imageElement.getBoundingClientRect();
 
     return {
-      x: event.nativeEvent.pageX - parentBoundingRect.left - window.scrollX,
-      y: event.nativeEvent.pageY - parentBoundingRect.top - window.scrollY,
+      x: event.nativeEvent.pageX - imageBoundingRect.left - window.scrollX,
+      y: event.nativeEvent.pageY - imageBoundingRect.top - window.scrollY,
     };
   }
 
@@ -268,6 +278,12 @@ export default class Image extends Component {
              onMouseMove={e => this.onMouseMoveOnImage(e)}
              onMouseUp={e => this.onMouseUpFromResizer(e)}
         />
+
+        <Labels
+          config={this.props.labelConfig}
+          savedLabels={this.state.boxes[index].labels}
+          onSavePressed={data => this.onLabelsChangedForBoxAtIndex(index, data)}
+        />
       </div>
     );
   }
@@ -278,7 +294,7 @@ export default class Image extends Component {
         <img
              role="presentation"
              src={this.props.url}
-             ref={(img) => this.imageElement = img}
+             ref={img => this.imageElement = img}
              draggable="false"
         />
 
@@ -305,7 +321,7 @@ export default class Image extends Component {
            onMouseMove={e => this.onMouseMoveOnImage(e)}
            onMouseUp={e => this.onMouseUpFromImage(e)}
       >
-        { this.props.error ? this.renderError() : this.renderImage() }
+        {this.props.error ? this.renderError() : this.renderImage() }
       </div>
     );
   }

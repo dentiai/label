@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Image from '../Image';
-import getBucketImageList from '../../util/getBucketImageList';
+import { getBucketImageList, downloadJSONFromBucket } from '../../util/io';
+import { LABEL_CONFIG_FILE_URL } from '../../constants';
 import './App.css';
 
 export default class App extends Component {
@@ -12,15 +13,20 @@ export default class App extends Component {
       currentImageUrl: null,
       currentImageIndex: 0,
       hasErroredOnLoad: false,
+      labelConfig: null
     }
 
     this.list = [];
 
-    getBucketImageList((list) => {
+    getBucketImageList(list => {
       this.list = list;
       const url = this.list[this.state.currentImageIndex];
       this.setState({ currentImageUrl: url });
       this.checkUrl(url);
+    });
+
+    downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, (labelConfig) => {
+      this.setState({ labelConfig });
     });
   }
 
@@ -95,7 +101,13 @@ export default class App extends Component {
           &rarr;
         </div>
 
-        {this.state.currentImageUrl ? <Image url={this.state.currentImageUrl} error={this.state.hasErroredOnLoad} /> : ''}
+        {this.state.currentImageUrl &&
+          <Image
+            url={this.state.currentImageUrl}
+            error={this.state.hasErroredOnLoad}
+            labelConfig={this.state.labelConfig}
+          />
+        }
       </div>
     );
   }

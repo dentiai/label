@@ -1,0 +1,101 @@
+.Labels {
+  position: relative;
+}
+
+.Labels__LabelListWrapper {
+  box-sizing: border-box;
+  position: absolute;
+  top: -1px;
+  left: -135px;
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border: 1px solid red;
+}
+
+.Labels--isEditing .Labels__LabelListWrapper {
+  left: -255px;
+  width: 250px;
+  height: 300px;
+}
+
+
+.Labels__LabelList {
+  box-sizing: border-box;
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-height: 100px;
+  overflow-y: scroll;
+  border-radius: 0 0 4px 4px;
+  padding-right: 2px;
+  margin-bottom: 3px;
+}
+
+.Labels__LabelList::-webkit-scrollbar {
+    width: 8px;
+}
+
+.Labels__LabelList::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 1px #000;
+    border-radius: 4px;
+}
+
+.Labels__LabelList::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 0 1px #000;
+}
+
+.Labels--isEditing .Labels__LabelList {
+  max-height: 200px;
+  flex-basis: auto;
+}
+
+.Label {
+  box-sizing: border-box;
+  width: 116px;
+  color: #392D16;
+  background-color: #FEC352;
+  border: 1px solid #BF943F;
+  font-size: 12px;
+  font-weight: bold;
+  margin: 0 0 1px 0;
+  padding: 3px 6px 2px;
+  text-align: right;
+  text-transform: uppercase;
+  border-radius: 4px 0 0 4px;
+}
+
+.Labels__AddEditButton {
+  width: 25px;
+  height: 25px;
+  padding: 3px 4px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.Labels__AvailableLabels {
+  position: absolute;
+  top: 0;
+  left: -205px;
+  box-sizing: border-box;
+  width: 200px;
+  height: 300px;
+  background-color: #D0D2D2;
+  color: #333;
+  border: 1px solid #BBB;
+  border-radius: 12px;
+}
+
+.AvailableLabel {
+  font-size: 14px;
+  text-align: right;
+  padding: 3px 6px 2px;
+  border-bottom: 1px solid #BBB;
+}
