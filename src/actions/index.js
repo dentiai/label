@@ -5,8 +5,7 @@ export const UPDATE_BOX               = 'UPDATE_BOX';
 export const DELETE_BOX               = 'DELETE_BOX';
 
 export const LOAD_LABEL_CONFIG        = 'LOAD_LABEL_CONFIG';
-export const UPDATE_BOX_LABELS        = 'UPDATE_BOX_LABELS';
-export const LOAD_ACTIVE_LABELS       = 'LOAD_ACTIVE_LABELS';
+export const TOGGLE_BOX_LABEL         = 'TOGGLE_BOX_LABEL';
 
 export const loadBoxes = (boxes) => ({
   type: LOAD_BOXES,
@@ -35,12 +34,7 @@ export const loadLabelConfig = (config) => ({
   payload: config,
 });
 
-export const updateBoxLabelsAtBoxIndex = (index, labels) => ({
-  type: UPDATE_BOX_LABELS,
-  payload: { index, labels }
-});
-
-export const loadActiveLabels = (activeLabels) => ({
-  type: LOAD_ACTIVE_LABELS,
-  payload: activeLabels,
+export const toggleLabelForBoxAtIndex = (index, label) => ({
+  type: TOGGLE_BOX_LABEL,
+  payload: { index, label }
 });

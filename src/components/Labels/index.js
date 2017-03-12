@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateBoxLabelsAtBoxIndex, loadActiveLabels } from '../../actions';
+import {
+  toggleLabelForBoxAtIndex,
+} from '../../actions';
 import './Labels.css';
 
 class Labels extends Component {
@@ -12,6 +14,12 @@ class Labels extends Component {
     };
   }
 
+  toggleActiveLabel(label) {
+    this.props.action.toggleLabelForBoxAtIndex(this.props.boxIndex, label);
+
+    this.forceUpdate();
+  }
+
   renderActiveLabel(label) {
     return (
       <p className="Label" key={label}>
@@ -21,7 +29,8 @@ class Labels extends Component {
   }
 
   renderAvailableLabel(label) {
-    let isChecked = this.props.activeLabels.indexOf(label) !== -1;
+    let isChecked = !!this.props.activeLabels &&
+                    this.props.activeLabels.indexOf(label) !== -1;
 
     return (
       <div
@@ -44,7 +53,7 @@ class Labels extends Component {
   renderAvailableLabelGroups() {
     let renderedGroups = [];
 
-    this.props.availableLabelGroups.forEach(group => {
+    this.props.labels.config.groups.forEach(group => {
       renderedGroups.push(group.labels.map(label => this.renderAvailableLabel(label)));
     });
 
@@ -68,9 +77,10 @@ class Labels extends Component {
             </div>
           }
 
-          { !this.state.isEditing && this.props.activeLabels > 0 &&
+          { !this.state.isEditing && this.props.labels.activeLabels > 0 &&
               <div className="Labels__LabelList">
-                {this.props.activeLabels.map(label => this.renderActiveLabel(label))}
+                {this.props.activeLabels &&
+                  this.props.activeLabels.map(label => this.renderActiveLabel(label))}
               </div>
           }
 
@@ -92,14 +102,12 @@ class Labels extends Component {
 // --- Connect Redux
 // ---
 const mapStateToProps = (state) => ({
-    activeLabels: state.labels.activeLabels,
-    availableLabelGroups: state.labels.config.groups,
+  labels: state.labels,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   action: {
-    updateBoxLabelsAtBoxIndex: (index, labels) => dispatch(updateBoxLabelsAtBoxIndex(index, labels)),
-    loadActiveLabels: (activeLabels) => dispatch(updateBoxLabelsAtBoxIndex(activeLabels)),
+    toggleLabelForBoxAtIndex: (index, labels) => dispatch(toggleLabelForBoxAtIndex(index, labels)),
   }
 });
 

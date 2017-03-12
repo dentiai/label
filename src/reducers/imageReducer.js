@@ -4,7 +4,7 @@ import {
   ADD_NEW_BOX,
   UPDATE_BOX,
   DELETE_BOX,
-  UPDATE_BOX_LABELS,
+  TOGGLE_BOX_LABEL,
 } from '../actions';
 
 const INIT_STATE = {
@@ -37,8 +37,18 @@ export default (state = INIT_STATE, action) => {
 
       return { ...state, boxes };
 
-    case UPDATE_BOX_LABELS:
-      boxes[action.payload.index].labels = action.payload.labels;
+    case TOGGLE_BOX_LABEL:
+      const boxLabels = boxes[action.payload.index].labels || [];
+
+      const labelIndex = boxLabels.indexOf(action.payload.label);
+
+      if (labelIndex > -1) {
+        boxLabels.splice(labelIndex, 1);
+      } else {
+        boxLabels.push(action.payload.label);
+      }
+
+      boxes[action.payload.index].labels = boxLabels;
 
       return { ...state, boxes };
 
