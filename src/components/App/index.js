@@ -1,32 +1,37 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Image from '../Image';
-import { getBucketImageList, downloadJSONFromBucket } from '../../util/io';
 import { LABEL_CONFIG_FILE_URL } from '../../constants';
+import { getBucketImageList, uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
+import { loadBoxes, loadLabelConfig } from '../../actions';
+import { connect } from 'react-redux';
 import './App.css';
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       currentImageUrl: null,
-      currentImageIndex: 0,
+      currentImageIndex: 71,
+      // currentImageIndex: 0,
       hasErroredOnLoad: false,
-      labelConfig: null
     }
 
     this.list = [];
+  }
 
+  componentDidMount() {
     getBucketImageList(list => {
       this.list = list;
       const url = this.list[this.state.currentImageIndex];
       this.setState({ currentImageUrl: url });
       this.checkUrl(url);
+      this.loadImageBoxes(url);
     });
 
-    downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, (labelConfig) => {
-      this.setState({ labelConfig });
+    downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, (config) => {
+      this.props.action.loadLabelConfig(config);
     });
   }
 
@@ -59,6 +64,9 @@ export default class App extends Component {
       });
 
       this.checkUrl(url);
+
+      this.loadImageBoxes(url);
+
   }
 
   /**
@@ -67,6 +75,8 @@ export default class App extends Component {
    * @return {void}
    */
   prevImage() {
+    this.saveCurrentImage();
+
     let imageIndex = this.state.currentImageIndex - 1;
 
     if (imageIndex === -1) {
@@ -82,6 +92,8 @@ export default class App extends Component {
    * @return {void}
    */
   nextImage() {
+    this.saveCurrentImage();
+
     let imageIndex = this.state.currentImageIndex + 1;
 
     if (imageIndex === this.list.length) {
@@ -89,6 +101,23 @@ export default class App extends Component {
     }
 
     this.setAndCheckImageAtIndex(imageIndex);
+  }
+
+  loadImageBoxes(url) {
+    downloadJSONFromBucket(this.getJSONFileNameForImage(url), (boxes) => {
+      this.props.action.loadBoxes(boxes);
+    });
+  }
+
+  saveCurrentImage() {
+    uploadJSONToBucket(
+      this.getJSONFileNameForImage(this.state.currentImageUrl),
+      this.props.image.boxes
+    );
+  }
+
+  getJSONFileNameForImage(url) {
+    return url.substring(url.lastIndexOf('/')+1) + ".json";
   }
 
   render() {
@@ -112,3 +141,19 @@ export default class App extends Component {
     );
   }
 }
+
+// ---
+// --- Connect Redux
+// ---
+const mapStateToProps = (state) => ({
+  image: state.image,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  action: {
+    loadLabelConfig: (config) => dispatch(loadLabelConfig(config)),
+    loadBoxes: (boxes) => dispatch(loadBoxes(boxes)),
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

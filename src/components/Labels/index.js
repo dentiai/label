@@ -1,50 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { updateBoxLabelsAtBoxIndex, loadActiveLabels } from '../../actions';
 import './Labels.css';
 
-export default class Labels extends Component {
+class Labels extends Component {
   constructor(props) {
     super(props);
 
-    this.availableLabels = [];
-
-    this.props.config.groups.forEach(group => {
-      group.labels.forEach(label => this.availableLabels.push(label));
-    });
-
-    let savedLabels = this.props.savedLabels && this.props.savedLabels.slice();
-
     this.state = {
       isEditing: false,
-      activeLabels: savedLabels || [],
     };
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.savedLabels !== undefined &&
-        JSON.stringify(prevProps.savedLabels) !== JSON.stringify(this.props.savedLabels)) {
-      this.setState({ activeLabels: this.props.savedLabels.slice() });
-    }
-  }
-
-  toggleActiveLabel(label) {
-    // we add the label to the active labels list if it isn't already there.
-    // if it is there, we remove it.
-    const activeLabels = this.state.activeLabels;
-    const labelIndex = activeLabels.indexOf(label);
-
-    if (labelIndex !== -1) {
-      activeLabels.splice(labelIndex, 1);
-    } else {
-      activeLabels.push(label);
-    }
-
-    this.setState({ activeLabels });
-  }
-
-  onSavePressed() {
-    this.setState({ isEditing: false });
-
-    this.props.onSavePressed(this.state.activeLabels);
   }
 
   renderActiveLabel(label) {
@@ -56,7 +21,7 @@ export default class Labels extends Component {
   }
 
   renderAvailableLabel(label) {
-    let isChecked = this.state.activeLabels.indexOf(label) !== -1;
+    let isChecked = this.props.activeLabels.indexOf(label) !== -1;
 
     return (
       <div
@@ -76,6 +41,16 @@ export default class Labels extends Component {
     );
   }
 
+  renderAvailableLabelGroups() {
+    let renderedGroups = [];
+
+    this.props.availableLabelGroups.forEach(group => {
+      renderedGroups.push(group.labels.map(label => this.renderAvailableLabel(label)));
+    });
+
+    return renderedGroups;
+  }
+
   render() {
     return (
       <div
@@ -88,19 +63,14 @@ export default class Labels extends Component {
           {this.state.isEditing &&
             <div>
               <div className="Labels__LabelList">
-                {this.availableLabels.map(label => this.renderAvailableLabel(label))}
-              </div>
-
-              <div className="Labels__EditButtons">
-                <button onClick={e => this.onSavePressed()}>Save</button>
-                <button>Cancel</button>
+                { this.renderAvailableLabelGroups() }
               </div>
             </div>
           }
 
-          { !this.state.isEditing && this.state.activeLabels.length > 0 &&
+          { !this.state.isEditing && this.props.activeLabels > 0 &&
               <div className="Labels__LabelList">
-                {this.state.activeLabels.map(label => this.renderActiveLabel(label))}
+                {this.props.activeLabels.map(label => this.renderActiveLabel(label))}
               </div>
           }
 
@@ -117,3 +87,20 @@ export default class Labels extends Component {
     );
   }
 }
+
+// ---
+// --- Connect Redux
+// ---
+const mapStateToProps = (state) => ({
+    activeLabels: state.labels.activeLabels,
+    availableLabelGroups: state.labels.config.groups,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  action: {
+    updateBoxLabelsAtBoxIndex: (index, labels) => dispatch(updateBoxLabelsAtBoxIndex(index, labels)),
+    loadActiveLabels: (activeLabels) => dispatch(updateBoxLabelsAtBoxIndex(activeLabels)),
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Labels);

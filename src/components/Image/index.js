@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
+import { connect } from 'react-redux';
+import {
+  drawNewBox,
+  addNewBox,
+  updateBoxAtIndex,
+  deleteBoxAtIndex,
+} from '../../actions';
 import Labels from '../Labels';
 import './Image.css';
 
@@ -10,7 +16,7 @@ const drawState = {
   resizing: 'resizing',
 };
 
-export default class Image extends Component {
+class Image extends Component {
 
   constructor(props) {
     super(props);
@@ -23,51 +29,13 @@ export default class Image extends Component {
 
     this.mouseBoxDeltaX = 0;
     this.mouseBoxDeltaY = 0;
-
-    this.state = {
-      boxes: [],
-      newBoxDimensions: null,
-    };
-  }
-
-  componentDidMount() {
-    this.loadBoxes(boxes => this.setState({ boxes }));
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ boxes: [] });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.url !== prevProps.url) {
-      this.loadBoxes(boxes => this.setState({ boxes }));
-    }
-  }
-
-  saveBoxes(boxes) {
-    for (let i = 0; i < boxes.length; i++) {
-      boxes[i].labels = boxes[i].labels || this.state.boxes[i].labels;
-    }
-
-    uploadJSONToBucket(this.getJSONFileName(), boxes);
-  }
-
-  onLabelsChangedForBoxAtIndex(index, labels) {
-    const boxes = this.state.boxes;
-    boxes[index].labels = labels;
-
-    this.saveBoxes(boxes);
-  }
-
-  loadBoxes(onLoad) {
-    downloadJSONFromBucket(this.getJSONFileName(), onLoad);
-  }
-
-  getJSONFileName() {
-    return this.props.url.substring(this.props.url.lastIndexOf('/')+1) + ".json";
   }
 
   onMouseDownOnImage(event) {
+    if (this.drawState !== drawState.default) {
+      return;
+    }
+
     const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
     const startX = mouseCoordinates.x;
@@ -75,9 +43,7 @@ export default class Image extends Component {
     const endX = startX;
     const endY = startY;
 
-    const newBoxDimensions = { startX, startY, endX, endY };
-
-    this.setState({ newBoxDimensions });
+    this.props.action.drawNewBox({ startX, startY, endX, endY });
 
     this.drawState = drawState.drawing;
   }
@@ -91,25 +57,22 @@ export default class Image extends Component {
 
     switch (this.drawState) {
       case drawState.drawing:
-        const newBoxDimensions = this.state.newBoxDimensions;
+        const newBox = this.props.image.newBox;
 
-        newBoxDimensions.endX = mouseCoordinates.x;
-        newBoxDimensions.endY = mouseCoordinates.y;
+        newBox.endX = mouseCoordinates.x;
+        newBox.endY = mouseCoordinates.y;
 
-        this.setState({ newBoxDimensions });
+        this.props.action.drawNewBox(newBox);
 
         return;
 
       case drawState.resizing:
-        const box = this.state.boxes[this.editingBoxIndex];
+        const box = this.props.image.boxes[this.editingBoxIndex];
 
         box.endX = mouseCoordinates.x;
         box.endY = mouseCoordinates.y;
 
-        const boxes = this.state.boxes;
-        boxes[this.editingBoxIndex] = box;
-
-        this.setState({ boxes });
+        this.props.action.updateBoxAtIndex(this.editingBoxIndex, box);
 
         return;
 
@@ -122,16 +85,12 @@ export default class Image extends Component {
       return;
     }
 
-    const boxes = this.state.boxes;
-    boxes.push(this.state.newBoxDimensions);
-    this.setState({ boxes, newBoxDimensions: null });
-
     this.drawState = drawState.default;
 
-    this.saveBoxes(boxes);
+    this.props.action.addNewBox();
   }
 
-  onMouseDownOnBox(event, boxIndex) {
+  onMouseDownOnBox(event, index) {
     if (this.drawState !== drawState.default) {
       return;
     }
@@ -142,14 +101,14 @@ export default class Image extends Component {
       return;
     }
 
-    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+    this.editingBoxIndex = index;
 
-    const box = this.state.boxes[boxIndex];
+    const box = this.props.image.boxes[this.editingBoxIndex];
+
+    const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
     this.mouseBoxDeltaX = mouseCoordinates.x - box.startX;
     this.mouseBoxDeltaY = mouseCoordinates.y - box.startY;
-
-    this.editingBoxIndex = boxIndex;
 
     this.drawState = drawState.moving;
   }
@@ -161,7 +120,7 @@ export default class Image extends Component {
 
     event.stopPropagation();
 
-    const box = this.state.boxes[this.editingBoxIndex];
+    const box = this.props.image.boxes[this.editingBoxIndex];
 
     const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
 
@@ -170,9 +129,10 @@ export default class Image extends Component {
     const endX = startX + (box.endX - box.startX);
     const endY = startY + (box.endY - box.startY);
 
-    const boxes = this.state.boxes;
-    boxes[this.editingBoxIndex] = { startX, startY, endX, endY };
-    this.setState({ boxes });
+    this.props.action.updateBoxAtIndex(
+      this.editingBoxIndex,
+      { startX, startY, endX, endY }
+    );
   }
 
   onMouseUpFromBox(event) {
@@ -182,16 +142,11 @@ export default class Image extends Component {
 
     event.stopPropagation();
 
-    this.mouseBoxDeltaX = 0;
-    this.mouseBoxDeltaY = 0;
-
-    this.editingBoxIndex = null;
+    this.resetEditingBox();
 
     this.forceUpdate();
 
     this.drawState = drawState.default;
-
-    this.saveBoxes(this.state.boxes);
   }
 
   onMouseDownOnResizer(event, index) {
@@ -213,13 +168,9 @@ export default class Image extends Component {
 
     event.stopPropagation();
 
-    this.editingBoxIndex = null;
-
-    this.forceUpdate();
+    this.resetEditingBox();
 
     this.drawState = drawState.default;
-
-    this.saveBoxes(this.state.boxes);
   }
 
   getImageMouseCoordinatesFromMouseEvent(event) {
@@ -231,13 +182,11 @@ export default class Image extends Component {
     };
   }
 
-  deleteBoxAtIndex(index) {
-    const boxes = this.state.boxes;
-    boxes.splice(index, 1);
+  resetEditingBox() {
+    this.editingBoxIndex = null;
 
-    this.setState({ boxes });
-
-    this.saveBoxes(boxes);
+    this.mouseBoxDeltaX = null;
+    this.mouseBoxDeltaY = null;
   }
 
   renderBox(dimensions, index = null, additionalClassName = '') {
@@ -270,7 +219,7 @@ export default class Image extends Component {
            style={boxStyle}
       >
         <div className="Image__Box__DeleteButton"
-             onClick={e => this.deleteBoxAtIndex(index)}
+             onClick={e => this.props.action.deleteBoxAtIndex(index)}
         />
 
         <div className="Image__Box__DragArea"
@@ -279,11 +228,7 @@ export default class Image extends Component {
              onMouseUp={e => this.onMouseUpFromResizer(e)}
         />
 
-        <Labels
-          config={this.props.labelConfig}
-          savedLabels={this.state.boxes[index].labels}
-          onSavePressed={data => this.onLabelsChangedForBoxAtIndex(index, data)}
-        />
+        <Labels boxIndex={index} />
       </div>
     );
   }
@@ -298,9 +243,10 @@ export default class Image extends Component {
              draggable="false"
         />
 
-        {this.state.newBoxDimensions !== null ? this.renderBox(this.state.newBoxDimensions, null, "Image___Box--Bordered") : ''}
+        {this.props.image.newBox &&
+          this.renderBox(this.props.image.newBox, null, "Image___Box--Bordered")}
 
-        {this.state.boxes.map((dimensions, index) => this.renderBox(dimensions, index))}
+        {this.props.image.boxes.map((dimensions, index) => this.renderBox(dimensions, index))}
       </div>
     );
   }
@@ -326,3 +272,21 @@ export default class Image extends Component {
     );
   }
 }
+
+// ---
+// --- Connect Redux
+// ---
+const mapStateToProps = (state) => ({
+  image: state.image,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  action: {
+    drawNewBox: (dimensions) => dispatch(drawNewBox(dimensions)),
+    addNewBox: () => dispatch(addNewBox()),
+    updateBoxAtIndex: (index, dimensions) => dispatch(updateBoxAtIndex(index, dimensions)),
+    deleteBoxAtIndex: (index) => dispatch(deleteBoxAtIndex(index)),
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Image);
