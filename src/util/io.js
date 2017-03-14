@@ -85,9 +85,10 @@ export const uploadJSONToBucket = (fileName, json, onUploaded) => {
  *
  * @param {string} fileName
  * @param {function} [onDownloaded]
+ * @param {function} [onError]
  */
-export const downloadJSONFromBucket = (fileName, onDownloaded) => {
+export const downloadJSONFromBucket = (fileName, onDownloaded, onError) => {
   axios.get(getAbsoluteFileUrlFromFileName(fileName))
        .then(response => typeof onDownloaded === "function" && onDownloaded(response.data))
-       .catch(error => console.log(error));
+       .catch(error => typeof onError === "function" ? onError(error) : console.log(error));
 };

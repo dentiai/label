@@ -13,7 +13,7 @@ class App extends Component {
 
     this.state = {
       currentImageUrl: null,
-      currentImageIndex: 71,
+      currentImageIndex: 72,
       // currentImageIndex: 0,
       hasErroredOnLoad: false,
     }
@@ -104,9 +104,13 @@ class App extends Component {
   }
 
   loadImageBoxes(url) {
-    downloadJSONFromBucket(this.getJSONFileNameForImage(url), (boxes) => {
-      this.props.action.loadBoxes(boxes);
-    });
+    downloadJSONFromBucket(
+      this.getJSONFileNameForImage(url),
+      (boxes) => {
+        this.props.action.loadBoxes(boxes);
+      },
+      (error) => this.props.action.loadBoxes([])
+    );
   }
 
   saveCurrentImage() {
@@ -134,7 +138,6 @@ class App extends Component {
           <Image
             url={this.state.currentImageUrl}
             error={this.state.hasErroredOnLoad}
-            labelConfig={this.state.labelConfig}
           />
         }
       </div>

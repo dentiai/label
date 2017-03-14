@@ -228,10 +228,12 @@ class Image extends Component {
              onMouseUp={e => this.onMouseUpFromResizer(e)}
         />
 
-        <Labels
-          boxIndex={index}
-          activeLabels={this.props.image.boxes[index].labels}
-        />
+        {this.props.image.boxes[index] &&
+          <Labels
+            boxIndex={index}
+            activeLabels={this.props.image.boxes[index].labels}
+          />
+        }
       </div>
     );
   }
