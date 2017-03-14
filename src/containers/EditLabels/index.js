@@ -2,21 +2,20 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   addLabelForBoxAtIndex,
+  deleteLabelsForBoxAtIndex,
   toggleLabelForBoxAtIndex,
 } from '../../actions';
-import './Labels.css';
+import './EditLabels.css';
 
 class Labels extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isEditing: false,
-    };
-  }
-
   addActiveLabel(label) {
     this.props.action.addLabelForBoxAtIndex(this.props.boxIndex, label);
+
+    this.forceUpdate();
+  }
+
+  deleteGroupLabels(group) {
+    this.props.action.deleteLabelsForBoxAtIndex(this.props.boxIndex, group.labels);
 
     this.forceUpdate();
   }
@@ -44,30 +43,22 @@ class Labels extends Component {
     return selected;
   }
 
-  onSelectChanged(event) {
+  onSelectChanged(event, group) {
     event.preventDefault();
 
     const selectedLabel = event.target.value;
 
     if (selectedLabel === '') {
-      return;
+      this.deleteGroupLabels(group);
+    } else {
+      this.addActiveLabel(selectedLabel);
     }
-
-    this.addActiveLabel(selectedLabel);
-  }
-
-  renderActiveLabel(label) {
-    return (
-      <p className="Label" key={label}>
-        {label}
-      </p>
-    );
   }
 
   renderCheckboxLabel(label) {
     return (
       <div
-        className="Label"
+        className="EditLabel"
         key={label}
       >
         <label>
@@ -85,10 +76,10 @@ class Labels extends Component {
 
   renderSelectGroup(group) {
     return (
-      <div className="LabelGroup LabelGroup--isMutuallyExclusive">
+      <div className="EditLabelsGroup EditLabelsGroup--isMutuallyExclusive">
         <select
             value={this.getSelectedInGroup(group)}
-            onChange={e => this.onSelectChanged(e)}
+            onChange={e => this.onSelectChanged(e, group)}
         >
           <option value=""></option>
 
@@ -100,7 +91,7 @@ class Labels extends Component {
     );
   }
 
-  renderAvailableLabelGroups() {
+  renderLabelGroups() {
     let renderedGroups = [];
 
     this.props.labels.config.groups.forEach((group, index) => {
@@ -112,7 +103,7 @@ class Labels extends Component {
         item = group.labels.map(label => this.renderCheckboxLabel(label));
       }
 
-      renderedGroups.push(<div key={index}>{item}</div>);
+      renderedGroups.push(<div key={group.id}>{item}</div>);
     });
 
     return renderedGroups;
@@ -121,35 +112,13 @@ class Labels extends Component {
   render() {
     return (
       <div
-          className={"Labels " + (this.state.isEditing && "Labels--isEditing")}
+          className={"EditLabels"}
           onMouseDown={e => e.stopPropagation()}
           onMouseMove={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
       >
-        <div className="Labels__LabelListWrapper">
-          {this.state.isEditing &&
-            <div>
-              <div className="Labels__LabelList">
-                { this.renderAvailableLabelGroups() }
-              </div>
-            </div>
-          }
-
-          { !this.state.isEditing && this.props.labels.activeLabels > 0 &&
-              <div className="Labels__LabelList">
-                {this.props.activeLabels &&
-                  this.props.activeLabels.map(label => this.renderActiveLabel(label))}
-              </div>
-          }
-
-          { !this.state.isEditing &&
-            <button
-              className="Labels__AddEditButton"
-              onClick={e => this.setState({ isEditing: true })}
-            >
-              +/-
-            </button>
-          }
+        <div className="EditLabels__Groups">
+          { this.renderLabelGroups() }
         </div>
       </div>
     );
@@ -165,8 +134,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   action: {
-    toggleLabelForBoxAtIndex: (index, labels) => dispatch(toggleLabelForBoxAtIndex(index, labels)),
+    toggleLabelForBoxAtIndex: (index, label) => dispatch(toggleLabelForBoxAtIndex(index, label)),
     addLabelForBoxAtIndex: (index, label) => dispatch(addLabelForBoxAtIndex(index, label)),
+    deleteLabelsForBoxAtIndex: (index, labels) => dispatch(deleteLabelsForBoxAtIndex(index, labels)),
   }
 });
 

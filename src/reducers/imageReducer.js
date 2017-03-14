@@ -32,7 +32,7 @@ export default (state = INIT_STATE, action) => {
       return { ...state, boxes, newBox: null };
 
     case UPDATE_BOX:
-      boxes[action.payload.index] = action.payload.newDimensions;
+      boxes[action.payload.index] = { ...boxes[action.payload.index], ...action.payload.newDimensions };
 
       return { ...state, boxes };
 

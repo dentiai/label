@@ -1,0 +1,19 @@
+.ShowLabels {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  max-height: inherit;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.ShowLabels__Label {
+  box-sizing: border-box;
+  padding: 2px;
+  background-color: #05839D;
+  color: white;
+  font-size: 14px;
+}
+.ShowLabels__Label:nth-child(odd) {
+  background-color: #04768D;
+}

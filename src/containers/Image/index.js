@@ -6,7 +6,8 @@ import {
   updateBoxAtIndex,
   deleteBoxAtIndex,
 } from '../../actions';
-import Labels from '../Labels';
+import EditLabels from '../EditLabels';
+import ShowLabels from '../../components/ShowLabels';
 import './Image.css';
 
 const drawState = {
@@ -29,6 +30,10 @@ class Image extends Component {
 
     this.mouseBoxDeltaX = 0;
     this.mouseBoxDeltaY = 0;
+
+    this.state = {
+      isEditingLabelsForBoxIndex: null,
+    };
   }
 
   onMouseDownOnImage(event) {
@@ -171,6 +176,19 @@ class Image extends Component {
     this.resetEditingBox();
 
     this.drawState = drawState.default;
+
+    this.forceUpdate();
+  }
+
+  onClickAddEditButton(event, index) {
+    this.setState(prevState => {
+      let isEditingLabelsForBoxIndex =
+        prevState.isEditingLabelsForBoxIndex === index ?
+                                                  null :
+                                                  index;
+
+        return { isEditingLabelsForBoxIndex };
+    });
   }
 
   getImageMouseCoordinatesFromMouseEvent(event) {
@@ -210,6 +228,8 @@ class Image extends Component {
       boxStyle.height = dimensions.startY - dimensions.endY;
     }
 
+    boxStyle.maxHeight = boxStyle.height;
+
     return (
       <div className={`Image__Box ${additionalClassName} ` + (index === this.editingBoxIndex ? `Image__Box--${this.drawState}` : '')}
            key={index}
@@ -228,8 +248,20 @@ class Image extends Component {
              onMouseUp={e => this.onMouseUpFromResizer(e)}
         />
 
-        {this.props.image.boxes[index] &&
-          <Labels
+        <div className="Image__Box__AddEditButton"
+             onClick={e => this.onClickAddEditButton(e, index)}
+        >
+          +/-
+        </div>
+
+        {this.props.image.boxes[index] && this.state.isEditingLabelsForBoxIndex !== index &&
+          <div className="Image__Box__ShowLabels">
+            <ShowLabels labels={this.props.image.boxes[index].labels} />
+          </div>
+        }
+
+        {this.props.image.boxes[index] && this.state.isEditingLabelsForBoxIndex === index &&
+          <EditLabels
             boxIndex={index}
             activeLabels={this.props.image.boxes[index].labels}
           />

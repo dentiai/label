@@ -121,3 +121,43 @@
   font-weight: bold;
   font-size: 10px;
 }
+
+.Image__Box__AddEditButton {
+  display: none;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: -11px;
+  bottom: -11px;
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 10px;
+  color: #333;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.Image__Box:hover .Image__Box__AddEditButton {
+  display: flex;
+}
+.Image__Box--moving .Image__Box__AddEditButton,
+.Image__Box--resizing .Image__Box__AddEditButton {
+  display: none !important;
+}
+
+
+.Image__Box__ShowLabels {
+  display: none;
+  max-height: inherit;
+}
+.Image__Box:hover .Image__Box__ShowLabels {
+  display: block;
+}
+.Image__Box--moving .Image__Box__ShowLabels,
+.Image__Box--resizing .Image__Box__ShowLabels {
+  display: none !important;
+}
