@@ -19,7 +19,52 @@ export const drawNewBox = (dimensions) => ({
   payload: dimensions,
 });
 
-export const addNewBox = () => ({ type: ADD_NEW_BOX });
+export const addNewBox = () => {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    // we check to see if there are any sequential labels on existing boxes.
+    // if there are, we automatically add the next label in each sequence.
+    const sequentialGroups = state.labels.config.groups.filter(group => group.isSequential);
+
+    let existingLabels = [];
+
+    state.image.boxes.forEach(box => {
+      if (box.labels !== undefined) {
+        box.labels.forEach(label => {
+          if (existingLabels.indexOf(label) === -1) {
+            existingLabels.push(label);
+          }
+        });
+      }
+    });
+
+    let sequences = [];
+
+    sequentialGroups.forEach(group => {
+      for (let i = group.labels.length - 1; i >= 0; i--) {
+        if (existingLabels.indexOf(group.labels[i]) > -1) {
+          sequences.push({ groupId: group.id, lastIndexInGroup: i });
+          break;
+        }
+      }
+    });
+
+    const newBoxIndex = state.image.boxes.length;
+
+    dispatch({ type: ADD_NEW_BOX });
+
+    sequences.forEach(sequence => {
+      const group = sequentialGroups.find(g => g.id === sequence.groupId);
+
+      const nextLabel = group.labels[sequence.lastIndexInGroup + 1];
+
+      if (nextLabel !== undefined) {
+        dispatch(addLabelForBoxAtIndex(newBoxIndex, nextLabel));
+      }
+    });
+  };
+};
 
 export const updateBoxAtIndex = (index, newDimensions) => ({
   type: UPDATE_BOX,
