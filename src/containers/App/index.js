@@ -13,8 +13,7 @@ class App extends Component {
 
     this.state = {
       currentImageUrl: null,
-      currentImageIndex: 72,
-      // currentImageIndex: 0,
+      currentImageIndex: 0,
       hasErroredOnLoad: false,
     }
 
