@@ -4,7 +4,9 @@ import {
   ADD_NEW_BOX,
   UPDATE_BOX,
   DELETE_BOX,
+  ADD_BOX_LABEL,
   TOGGLE_BOX_LABEL,
+  DELETE_BOX_LABEL,
 } from '../actions';
 
 const INIT_STATE = {
@@ -13,7 +15,9 @@ const INIT_STATE = {
 }
 
 export default (state = INIT_STATE, action) => {
-  let { boxes, editingBoxIndex } = state;
+  let { boxes } = state;
+  let boxLabels = [];
+  let labelIndex = null;
 
   switch (action.type) {
     case LOAD_BOXES:
@@ -37,15 +41,34 @@ export default (state = INIT_STATE, action) => {
 
       return { ...state, boxes };
 
-    case TOGGLE_BOX_LABEL:
-      const boxLabels = boxes[action.payload.index].labels || [];
+    case ADD_BOX_LABEL:
+      boxLabels = boxes[action.payload.index].labels || [];
+      boxLabels.push(action.payload.label);
 
-      const labelIndex = boxLabels.indexOf(action.payload.label);
+      boxes[action.payload.index].labels = boxLabels;
+
+      return { ...state, boxes };
+
+    case TOGGLE_BOX_LABEL:
+      boxLabels = boxes[action.payload.index].labels || [];
+      labelIndex = boxLabels.indexOf(action.payload.label);
 
       if (labelIndex > -1) {
         boxLabels.splice(labelIndex, 1);
       } else {
         boxLabels.push(action.payload.label);
+      }
+
+      boxes[action.payload.index].labels = boxLabels;
+
+      return { ...state, boxes };
+
+    case DELETE_BOX_LABEL:
+      boxLabels = boxes[action.payload.index].labels || [];
+      labelIndex = boxLabels.indexOf(action.payload.label);
+
+      if (labelIndex > -1) {
+        boxLabels.splice(labelIndex, 1);
       }
 
       boxes[action.payload.index].labels = boxLabels;

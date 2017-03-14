@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+  addLabelForBoxAtIndex,
   toggleLabelForBoxAtIndex,
 } from '../../actions';
 import './Labels.css';
@@ -14,10 +15,45 @@ class Labels extends Component {
     };
   }
 
+  addActiveLabel(label) {
+    this.props.action.addLabelForBoxAtIndex(this.props.boxIndex, label);
+
+    this.forceUpdate();
+  }
+
   toggleActiveLabel(label) {
     this.props.action.toggleLabelForBoxAtIndex(this.props.boxIndex, label);
 
     this.forceUpdate();
+  }
+
+  activeLabelsInclude(label) {
+    return !!this.props.activeLabels &&
+      this.props.activeLabels.indexOf(label) !== -1;
+  }
+
+  getSelectedInGroup(group) {
+    let selected = '';
+
+    group.labels.forEach(label => {
+      if (this.activeLabelsInclude(label)) {
+        selected = label;
+      }
+    });
+
+    return selected;
+  }
+
+  onSelectChanged(event) {
+    event.preventDefault();
+
+    const selectedLabel = event.target.value;
+
+    if (selectedLabel === '') {
+      return;
+    }
+
+    this.addActiveLabel(selectedLabel);
   }
 
   renderActiveLabel(label) {
@@ -28,10 +64,7 @@ class Labels extends Component {
     );
   }
 
-  renderAvailableLabel(label) {
-    let isChecked = !!this.props.activeLabels &&
-                    this.props.activeLabels.indexOf(label) !== -1;
-
+  renderCheckboxLabel(label) {
     return (
       <div
         className="Label"
@@ -40,7 +73,7 @@ class Labels extends Component {
         <label>
           <input
             type="checkbox"
-            checked={isChecked}
+            checked={this.activeLabelsInclude(label)}
             onChange={e => this.toggleActiveLabel(label)}
           />
 
@@ -50,11 +83,36 @@ class Labels extends Component {
     );
   }
 
+  renderSelectGroup(group) {
+    return (
+      <div className="LabelGroup LabelGroup--isMutuallyExclusive">
+        <select
+            value={this.getSelectedInGroup(group)}
+            onChange={e => this.onSelectChanged(e)}
+        >
+          <option value=""></option>
+
+          {group.labels.map(label => (
+            <option key={label} value={label}>{label}</option>
+          ))};
+        </select>
+      </div>
+    );
+  }
+
   renderAvailableLabelGroups() {
     let renderedGroups = [];
 
-    this.props.labels.config.groups.forEach(group => {
-      renderedGroups.push(group.labels.map(label => this.renderAvailableLabel(label)));
+    this.props.labels.config.groups.forEach((group, index) => {
+      let item = null;
+
+      if (group.areLabelsMutuallyExclusive) {
+          item = this.renderSelectGroup(group);
+      } else {
+        item = group.labels.map(label => this.renderCheckboxLabel(label));
+      }
+
+      renderedGroups.push(<div key={index}>{item}</div>);
     });
 
     return renderedGroups;
@@ -108,6 +166,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   action: {
     toggleLabelForBoxAtIndex: (index, labels) => dispatch(toggleLabelForBoxAtIndex(index, labels)),
+    addLabelForBoxAtIndex: (index, label) => dispatch(addLabelForBoxAtIndex(index, label)),
   }
 });
 
