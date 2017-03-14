@@ -6,7 +6,7 @@ import {
   DELETE_BOX,
   ADD_BOX_LABEL,
   TOGGLE_BOX_LABEL,
-  DELETE_BOX_LABEL,
+  DELETE_BOX_LABELS,
 } from '../actions';
 
 const INIT_STATE = {
@@ -63,13 +63,16 @@ export default (state = INIT_STATE, action) => {
 
       return { ...state, boxes };
 
-    case DELETE_BOX_LABEL:
+    case DELETE_BOX_LABELS:
       boxLabels = boxes[action.payload.index].labels || [];
-      labelIndex = boxLabels.indexOf(action.payload.label);
 
-      if (labelIndex > -1) {
-        boxLabels.splice(labelIndex, 1);
-      }
+      action.payload.labels.forEach(label => {
+        labelIndex = boxLabels.indexOf(label);
+
+        if (labelIndex > -1) {
+          boxLabels.splice(labelIndex, 1);
+        }
+      });
 
       boxes[action.payload.index].labels = boxLabels;
 

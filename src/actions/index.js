@@ -6,7 +6,7 @@ export const DELETE_BOX               = 'DELETE_BOX';
 
 export const LOAD_LABEL_CONFIG        = 'LOAD_LABEL_CONFIG';
 export const ADD_BOX_LABEL            = 'ADD_BOX_LABEL';
-export const DELETE_BOX_LABEL         = 'DELETE_BOX_LABEL';
+export const DELETE_BOX_LABELS        = 'DELETE_BOX_LABELS';
 export const TOGGLE_BOX_LABEL         = 'TOGGLE_BOX_LABEL';
 
 export const loadBoxes = (boxes) => ({
@@ -123,11 +123,9 @@ export const addLabelForBoxAtIndex = (index, label) => {
       // associated with any given box. so we delete all other group members
       // from this box before we add the new label.
       if (owningGroup !== null) {
-        owningGroup.labels.forEach(groupMember => {
-          dispatch({
-            type: DELETE_BOX_LABEL,
-            payload: { index, label: groupMember },
-          });
+        dispatch({
+          type: DELETE_BOX_LABELS,
+          payload: { index, labels: owningGroup.labels },
         });
       }
 
