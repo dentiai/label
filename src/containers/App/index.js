@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Image from '../Image';
-import { LABEL_CONFIG_FILE_URL } from '../../constants';
+import Modal from 'simple-react-modal';
+import { LABEL_CONFIG_FILE_URL, CHECK_IMAGE_DIRTY_INTERVAL } from '../../constants';
 import { getBucketImageList, uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
 import { loadImage, clearImage, loadLabelConfig } from '../../actions';
 import { connect } from 'react-redux';
@@ -15,6 +16,9 @@ class App extends Component {
       currentImageUrl: null,
       currentImageIndex: 0,
       hasErroredOnLoad: false,
+      isCurrentImageClean: true,
+      showModal: false,
+      navAttempt: null,
     }
 
     this.list = [];
@@ -23,7 +27,9 @@ class App extends Component {
   componentDidMount() {
     getBucketImageList(list => {
       this.list = list;
+
       const url = this.list[this.state.currentImageIndex];
+
       this.setState({ currentImageUrl: url });
       this.checkUrl(url);
       this.loadImageBoxes(url);
@@ -32,6 +38,17 @@ class App extends Component {
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, (config) => {
       this.props.action.loadLabelConfig(config);
     });
+
+    setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
+  }
+
+  /**
+   * Check if image needs saving and update state
+   *
+   * @return {void}
+   */
+  tick() {
+    this.setState((prevState) => ({ isCurrentImageClean: this.isCurrentImageClean() }));
   }
 
   /**
@@ -55,11 +72,15 @@ class App extends Component {
    * @return {void}
    */
   setAndCheckImageAtIndex(index) {
+    this.props.action.clearImage();
+
     const url = this.list[index];
 
     this.setState({
       currentImageIndex: index,
       currentImageUrl: url,
+      showModal: false,
+      navAttempt: null,
     });
 
     this.checkUrl(url);
@@ -70,10 +91,14 @@ class App extends Component {
   /**
    * Load previous image in image list
    *
+   * @param {boolean} force
    * @return {void}
    */
-  prevImage() {
-    this.saveCurrentImage();
+  prevImage(force = false) {
+    if (!force && this.isCurrentImageDirty()) {
+      this.setState({ showModal: true, navAttempt: this.prevImage.bind(this) });
+      return;
+    }
 
     let imageIndex = this.state.currentImageIndex - 1;
 
@@ -87,10 +112,14 @@ class App extends Component {
   /**
    * Load next image in image list
    *
+   * @param {boolean} [force]
    * @return {void}
    */
-  nextImage() {
-    this.saveCurrentImage();
+  nextImage(force = false) {
+    if (!force && this.isCurrentImageDirty()) {
+      this.setState({ showModal: true, navAttempt: this.nextImage.bind(this) });
+      return;
+    }
 
     let imageIndex = this.state.currentImageIndex + 1;
 
@@ -105,25 +134,23 @@ class App extends Component {
     downloadJSONFromBucket(
       this.getJSONFileNameForImage(url),
       (data) => {
-        this.props.action.clearImage();
-
         this.props.action.loadImage(data.currentBoxes, data.history);
       },
       (error) => {
         console.log(error);
-        
+
         this.props.action.clearImage();
       }
     );
   }
 
   saveCurrentImage() {
-    const currentBoxes = this.props.image.boxes;
-    const prevBoxes = this.props.image.prevBoxes;
-
-    if (JSON.stringify(prevBoxes) === JSON.stringify(currentBoxes)) {
+    if (this.isCurrentImageClean()) {
       return;
     }
+
+    const currentBoxes = this.props.image.boxes;
+    const prevBoxes = this.props.image.prevBoxes;
 
     const history = this.props.image.history || {};
 
@@ -135,30 +162,74 @@ class App extends Component {
 
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
-      { currentBoxes, history }
+      { currentBoxes, history },
+      () => this.props.action.loadImage(currentBoxes, history)
     );
+  }
+
+  isCurrentImageClean() {
+    const { prevBoxes, boxes } = this.props.image;
+
+    return JSON.stringify(prevBoxes) === JSON.stringify(boxes);
+  }
+
+  isCurrentImageDirty() {
+    return !this.isCurrentImageClean();
   }
 
   getJSONFileNameForImage(url) {
     return url.substring(url.lastIndexOf('/')+1) + ".json";
   }
 
+  handleModalConfirmation(event) {
+    this.state.navAttempt(true);
+  }
+
+  handlModalCancellation(event) {
+    this.setState({
+      showModal: false,
+      navAttempt: null,
+    });
+  }
+
   render() {
     return (
       <div className="App">
-        <div onClick={() => this.prevImage()} className="App__NavButton App__NavButton--Prev">
-          &larr;
-        </div>
-        <div onClick={() => this.nextImage()} className="App__NavButton App__NavButton--Next">
-          &rarr;
+        <Modal show={this.state.showModal} containerStyle={{borderRadius: "4px"}}>
+          <div className="App__ModalContent">
+            <p>This image has unsaved changes. Are you sure you want to navigate away?</p>
+
+            <button onClick={e => this.handleModalConfirmation(e)}>Yes</button>
+            &nbsp;
+            <button onClick={e => this.handlModalCancellation(e)}>Cancel, stay a while</button>
+          </div>
+        </Modal>
+
+        <div className="App__ControlBar">
+          <div onClick={() => this.prevImage()} className="App__NavButton App__NavButton--Prev">
+            &larr;
+          </div>
+
+          <div onClick={() => this.nextImage()} className="App__NavButton App__NavButton--Next">
+            &rarr;
+          </div>
+
+          <button
+            className="App__SaveButton"
+            disabled={this.state.isCurrentImageClean}
+            onClick={e => this.saveCurrentImage()}
+          >
+            Save image
+          </button>
         </div>
 
+      <div className="App__Image">
         {this.state.currentImageUrl &&
           <Image
             url={this.state.currentImageUrl}
             error={this.state.hasErroredOnLoad}
           />
-        }
+        }</div>
       </div>
     );
   }
