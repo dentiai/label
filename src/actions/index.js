@@ -1,4 +1,6 @@
-export const LOAD_BOXES               = 'LOAD_BOXES';
+export const LOAD_IMAGE               = 'LOAD_IMAGE';
+export const CLEAR_IMAGE              = 'CLEAR_IMAGE';
+
 export const DRAW_NEW_BOX             = 'DRAW_NEW_BOX';
 export const ADD_NEW_BOX              = 'ADD_NEW_BOX';
 export const UPDATE_BOX               = 'UPDATE_BOX';
@@ -9,10 +11,12 @@ export const ADD_BOX_LABEL            = 'ADD_BOX_LABEL';
 export const DELETE_BOX_LABELS        = 'DELETE_BOX_LABELS';
 export const TOGGLE_BOX_LABEL         = 'TOGGLE_BOX_LABEL';
 
-export const loadBoxes = (boxes) => ({
-  type: LOAD_BOXES,
-  payload: boxes,
+export const loadImage = (boxes, history) => ({
+  type: LOAD_IMAGE,
+  payload: { boxes, history },
 });
+
+export const clearImage = () => ({ type: CLEAR_IMAGE });
 
 export const addLabelForBoxAtIndex = (index, label) => {
   return (dispatch, getState) => {

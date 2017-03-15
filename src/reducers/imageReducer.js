@@ -1,5 +1,8 @@
+import { copyJSON } from '../util/helpers';
+
 import {
-  LOAD_BOXES,
+  LOAD_IMAGE,
+  CLEAR_IMAGE,
   DRAW_NEW_BOX,
   ADD_NEW_BOX,
   UPDATE_BOX,
@@ -12,16 +15,26 @@ import {
 const INIT_STATE = {
   boxes: [],
   newBox: null,
+
+  prevBoxes: null,
+  history: null,
 }
 
 export default (state = INIT_STATE, action) => {
-  let { boxes } = state;
+  let boxes = copyJSON(state.boxes);
   let boxLabels = [];
   let labelIndex = null;
 
   switch (action.type) {
-    case LOAD_BOXES:
-      return { ...state, boxes: action.payload };
+    case LOAD_IMAGE:
+      return {
+        ...state,
+        boxes: copyJSON(action.payload.boxes) || [],
+        prevBoxes: copyJSON(action.payload.boxes) || null,
+        history: copyJSON(action.payload.history) || null,
+      };
+
+    case CLEAR_IMAGE: return INIT_STATE;
 
     case DRAW_NEW_BOX:
       return { ...state, newBox: action.payload };

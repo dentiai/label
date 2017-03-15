@@ -3,7 +3,7 @@ import axios from 'axios';
 import Image from '../Image';
 import { LABEL_CONFIG_FILE_URL } from '../../constants';
 import { getBucketImageList, uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
-import { loadBoxes, loadLabelConfig } from '../../actions';
+import { loadImage, clearImage, loadLabelConfig } from '../../actions';
 import { connect } from 'react-redux';
 import './App.css';
 
@@ -55,17 +55,16 @@ class App extends Component {
    * @return {void}
    */
   setAndCheckImageAtIndex(index) {
-      const url = this.list[index];
+    const url = this.list[index];
 
-      this.setState({
-        currentImageIndex: index,
-        currentImageUrl: url,
-      });
+    this.setState({
+      currentImageIndex: index,
+      currentImageUrl: url,
+    });
 
-      this.checkUrl(url);
+    this.checkUrl(url);
 
-      this.loadImageBoxes(url);
-
+    this.loadImageBoxes(url);
   }
 
   /**
@@ -105,17 +104,38 @@ class App extends Component {
   loadImageBoxes(url) {
     downloadJSONFromBucket(
       this.getJSONFileNameForImage(url),
-      (boxes) => {
-        this.props.action.loadBoxes(boxes);
+      (data) => {
+        this.props.action.clearImage();
+
+        this.props.action.loadImage(data.currentBoxes, data.history);
       },
-      (error) => this.props.action.loadBoxes([])
+      (error) => {
+        console.log(error);
+        
+        this.props.action.clearImage();
+      }
     );
   }
 
   saveCurrentImage() {
+    const currentBoxes = this.props.image.boxes;
+    const prevBoxes = this.props.image.prevBoxes;
+
+    if (JSON.stringify(prevBoxes) === JSON.stringify(currentBoxes)) {
+      return;
+    }
+
+    const history = this.props.image.history || {};
+
+    if (prevBoxes) {
+      const timestamp = (new Date()).valueOf();
+
+      history[timestamp] = prevBoxes;
+    }
+
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
-      this.props.image.boxes
+      { currentBoxes, history }
     );
   }
 
@@ -154,7 +174,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   action: {
     loadLabelConfig: (config) => dispatch(loadLabelConfig(config)),
-    loadBoxes: (boxes) => dispatch(loadBoxes(boxes)),
+    loadImage: (boxes, history) => dispatch(loadImage(boxes, history)),
+    clearImage: (boxes) => dispatch(clearImage(boxes)),
   }
 });
 
