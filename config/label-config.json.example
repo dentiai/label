@@ -1,0 +1,71 @@
+{
+  "groups": [
+    {
+      "id": "1",
+      "isSequential": true,
+      "areLabelsMutuallyExclusive": true,
+      "labels": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32"
+      ]
+    },
+    {
+      "id": "2",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": false,
+      "labels": [
+        "Lorem",
+        "Ipsum",
+        "Dolor",
+        "Sit Amet",
+        "Consectetur Adipiscing Elit",
+        "Quisque",
+        "Et",
+        "Metus A Velit",
+        "Consectetur Pellentesque",
+        "Quis Ac Leo"
+      ]
+    },
+    {
+      "id": "3",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": true,
+      "labels": [
+        "Praesent",
+        "Non Quam Quis",
+        "Odio Sagittis Lacinia",
+        "Quisque Sit Amet Nisi Vitae Mauris"
+      ]
+    }
+  ]
+}
