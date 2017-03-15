@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Image from '../Image';
 import Modal from 'simple-react-modal';
-import { LABEL_CONFIG_FILE_URL, CHECK_IMAGE_DIRTY_INTERVAL } from '../../constants';
+import {
+  LABEL_CONFIG_FILE_URL,
+  CHECK_IMAGE_DIRTY_INTERVAL,
+  FLASH_ALERT_ONSCREEN_TIME
+} from '../../constants';
 import { getBucketImageList, uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
 import { loadImage, clearImage, loadLabelConfig } from '../../actions';
 import { connect } from 'react-redux';
@@ -19,7 +23,9 @@ class App extends Component {
       isCurrentImageClean: true,
       showModal: false,
       navAttempt: null,
-    }
+      isSaving: false,
+      isSaved: false,
+    };
 
     this.list = [];
   }
@@ -149,6 +155,8 @@ class App extends Component {
       return;
     }
 
+    this.setState({ isSaving: true });
+
     const currentBoxes = this.props.image.boxes;
     const prevBoxes = this.props.image.prevBoxes;
 
@@ -163,7 +171,15 @@ class App extends Component {
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
       { currentBoxes, history },
-      () => this.props.action.loadImage(currentBoxes, history)
+      () => {
+        this.setState({ isSaved: true });
+
+        setTimeout(() => {
+          this.setState({ isSaving: false, isSaved: false, isCurrentImageClean: true });
+
+          this.props.action.loadImage(currentBoxes, history);
+        }, FLASH_ALERT_ONSCREEN_TIME);
+      }
     );
   }
 
@@ -206,20 +222,30 @@ class App extends Component {
         </Modal>
 
         <div className="App__ControlBar">
-          <div onClick={() => this.prevImage()} className="App__NavButton App__NavButton--Prev">
+          <button
+            onClick={() => this.prevImage()}
+            className="App__NavButton App__NavButton--Prev"
+            disabled={this.state.isSaving}
+          >
             &larr;
-          </div>
+          </button>
 
-          <div onClick={() => this.nextImage()} className="App__NavButton App__NavButton--Next">
+          <button
+            onClick={() => this.nextImage()}
+            className="App__NavButton App__NavButton--Next"
+            disabled={this.state.isSaving}
+          >
             &rarr;
-          </div>
+          </button>
 
           <button
             className="App__SaveButton"
             disabled={this.state.isCurrentImageClean}
             onClick={e => this.saveCurrentImage()}
           >
-            Save image
+            {this.state.isSaved && '👌 All done'}
+
+            {!this.state.isSaved && (this.state.isSaving ? 'Saving...': 'Save image')}
           </button>
         </div>
 

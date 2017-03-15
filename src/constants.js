@@ -6,3 +6,6 @@ export const LABEL_CONFIG_FILE_URL = `${APP_URL}/config/label-config.json`;
 
 // in milliseconds
 export const CHECK_IMAGE_DIRTY_INTERVAL = 500;
+
+// in milliseconds
+export const FLASH_ALERT_ONSCREEN_TIME = 1000;
