@@ -108,7 +108,7 @@ class App extends Component {
   /**
    * Load previous image in image list
    *
-   * @param {boolean} force
+   * @param {boolean} [force]
    * @return {void}
    */
   prevImage(force = false) {
@@ -138,7 +138,7 @@ class App extends Component {
   /**
    * Retrieve the index of the next image in rotation
    *
-   * @param {string} direction of rotation (forward or backward)
+   * @param {string} dir direction of rotation (forward or backward)
    * @param {number} [currentIndex] index to use as current in rotation
    * @return {number|null}
    */
