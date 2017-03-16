@@ -16,7 +16,7 @@ const INIT_STATE = {
   boxes: [],
   newBox: null,
 
-  prevBoxes: null,
+  prevBoxes: [],
   history: null,
 }
 
@@ -30,7 +30,7 @@ export default (state = INIT_STATE, action) => {
       return {
         ...state,
         boxes: copyJSON(action.payload.boxes) || [],
-        prevBoxes: copyJSON(action.payload.boxes) || null,
+        prevBoxes: copyJSON(action.payload.boxes) || [],
         history: copyJSON(action.payload.history) || null,
       };
 

@@ -12,6 +12,11 @@ import { loadImage, clearImage, loadLabelConfig } from '../../actions';
 import { connect } from 'react-redux';
 import './App.css';
 
+const direction = {
+  forward: 'forward',
+  backward: 'backward',
+};
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -25,6 +30,8 @@ class App extends Component {
       navAttempt: null,
       isSaving: false,
       isSaved: false,
+      nextImageUrl: null,
+      prevImageUrl: null,
     };
 
     this.list = [];
@@ -34,11 +41,7 @@ class App extends Component {
     getBucketImageList(list => {
       this.list = list;
 
-      const url = this.list[this.state.currentImageIndex];
-
-      this.setState({ currentImageUrl: url });
-      this.checkUrl(url);
-      this.loadImageBoxes(url);
+      this.setAndCheckImageAtIndex(this.state.currentImageIndex, false);
     });
 
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, (config) => {
@@ -75,23 +78,31 @@ class App extends Component {
    * URL
    *
    * @param {number} index
+   * @param {boolean} clear the current image first
    * @return {void}
    */
-  setAndCheckImageAtIndex(index) {
-    this.props.action.clearImage();
+  setAndCheckImageAtIndex(index, clear = true) {
+    if (clear) {
+      this.props.action.clearImage();
+    }
 
-    const url = this.list[index];
+    const currentImageUrl = this.list[index];
+
+    const prevImageUrl = this.list[this.getNextImageIndexGoingIn(direction.backward, index)];
+    const nextImageUrl = this.list[this.getNextImageIndexGoingIn(direction.forward, index)];
 
     this.setState({
       currentImageIndex: index,
-      currentImageUrl: url,
+      currentImageUrl,
+      prevImageUrl,
+      nextImageUrl,
       showModal: false,
       navAttempt: null,
     });
 
-    this.checkUrl(url);
+    this.checkUrl(currentImageUrl);
 
-    this.loadImageBoxes(url);
+    this.loadImageBoxes(currentImageUrl);
   }
 
   /**
@@ -106,13 +117,7 @@ class App extends Component {
       return;
     }
 
-    let imageIndex = this.state.currentImageIndex - 1;
-
-    if (imageIndex === -1) {
-      imageIndex = this.list.length - 1;
-    }
-
-    this.setAndCheckImageAtIndex(imageIndex);
+    this.setAndCheckImageAtIndex(this.getNextImageIndexGoingIn(direction.backward));
   }
 
   /**
@@ -127,13 +132,34 @@ class App extends Component {
       return;
     }
 
-    let imageIndex = this.state.currentImageIndex + 1;
+    this.setAndCheckImageAtIndex(this.getNextImageIndexGoingIn(direction.forward));
+  }
 
-    if (imageIndex === this.list.length) {
-      imageIndex = 0;
+  /**
+   * Retrieve the index of the next image in rotation
+   *
+   * @param {string} direction of rotation (forward or backward)
+   * @param {number} [currentIndex] index to use as current in rotation
+   * @return {number|null}
+   */
+  getNextImageIndexGoingIn(dir, currentIndex = this.state.currentImageIndex) {
+    let nextIndex = null;
+
+    if (dir === direction.forward) {
+      nextIndex = currentIndex + 1;
+
+      if (nextIndex === this.list.length) {
+        nextIndex = 0;
+      }
+    } else if (dir === direction.backward){
+      nextIndex = currentIndex - 1;
+
+      if (nextIndex === -1) {
+        nextIndex = this.list.length - 1;
+      }
     }
 
-    this.setAndCheckImageAtIndex(imageIndex);
+    return nextIndex;
   }
 
   loadImageBoxes(url) {
@@ -162,7 +188,7 @@ class App extends Component {
 
     const history = this.props.image.history || {};
 
-    if (prevBoxes) {
+    if (prevBoxes.length > 0) {
       const timestamp = (new Date()).valueOf();
 
       history[timestamp] = prevBoxes;
@@ -249,13 +275,19 @@ class App extends Component {
           </button>
         </div>
 
-      <div className="App__Image">
-        {this.state.currentImageUrl &&
-          <Image
-            url={this.state.currentImageUrl}
-            error={this.state.hasErroredOnLoad}
-          />
-        }</div>
+        <div className="App__Image">
+          {this.state.currentImageUrl &&
+            <Image
+              url={this.state.currentImageUrl}
+              error={this.state.hasErroredOnLoad}
+            />
+          }
+        </div>
+
+        <div className="App__PreloadedImages" style={{display: "none"}}>
+          {this.state.prevImageUrl && <img src={this.state.prevImageUrl} role="presentation" />}
+          {this.state.nextImageUrl && <img src={this.state.nextImageUrl} role="presentation" />}
+        </div>
       </div>
     );
   }
