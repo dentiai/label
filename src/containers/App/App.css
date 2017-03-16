@@ -1,25 +1,71 @@
 .App { }
 
-.App__NavButton {
-  position: fixed;
-  z-index: 2;
-  top: 15px;
-  width: 1.5em;
-  height: 1em;
-  line-height: 1;
+.App__ModalContent {
+  color: #333;
+}
+
+.App__ControlBar {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 52px;
+  padding: 9px 0;
   text-align: center;
-  font-size: 3em;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: #222;
+  border-bottom: 2px solid #fff;
+}
+.App__ControlBar:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.App__NavButton {
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  line-height: 0.85;
+  text-align: center;
+  font-size: 1.5em;
+  background-color: #666;
   color: #fff;
+  border: 1px solid #888;
   border-radius: 30px;
   cursor: pointer;
   user-select: none;
 }
-
+.App__NavButton[disabled] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
 .App__NavButton--Prev {
-  left: 15px;
+  float: left;
+  margin-left: 10px;
+}
+.App__NavButton--Next {
+  float: right;
+  margin-right: 10px;
 }
 
-.App__NavButton--Next {
-  right: 15px;
+.App__SaveButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8em;
+  height: 2em;
+  font-size: 14px;
+  background-color: #666;
+  color: #fff;
+  border: 1px solid #888;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.App__SaveButton[disabled] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.App__Image {
+
 }
