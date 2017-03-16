@@ -162,7 +162,7 @@ class App extends Component {
 
     const history = this.props.image.history || {};
 
-    if (prevBoxes) {
+    if (prevBoxes.length > 0) {
       const timestamp = (new Date()).valueOf();
 
       history[timestamp] = prevBoxes;
@@ -185,6 +185,11 @@ class App extends Component {
 
   isCurrentImageClean() {
     const { prevBoxes, boxes } = this.props.image;
+
+    // handle case when image does not have associated data yet
+    // if (boxes && boxes.length === 0 && !prevBoxes) {
+    //   return true;
+    // }
 
     return JSON.stringify(prevBoxes) === JSON.stringify(boxes);
   }
