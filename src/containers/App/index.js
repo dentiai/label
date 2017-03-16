@@ -212,11 +212,6 @@ class App extends Component {
   isCurrentImageClean() {
     const { prevBoxes, boxes } = this.props.image;
 
-    // handle case when image does not have associated data yet
-    // if (boxes && boxes.length === 0 && !prevBoxes) {
-    //   return true;
-    // }
-
     return JSON.stringify(prevBoxes) === JSON.stringify(boxes);
   }
 
