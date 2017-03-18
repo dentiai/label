@@ -3,6 +3,7 @@ import { copyJSON } from '../util/helpers';
 import {
   LOAD_IMAGE,
   CLEAR_IMAGE,
+  REVERT_IMAGE,
   DRAW_NEW_BOX,
   ADD_NEW_BOX,
   CLEAR_NEW_BOX,
@@ -36,6 +37,11 @@ export default (state = INIT_STATE, action) => {
       };
 
     case CLEAR_IMAGE: return INIT_STATE;
+
+    case REVERT_IMAGE:
+      boxes = copyJSON(state.prevBoxes);
+
+      return { ...state, boxes };
 
     case DRAW_NEW_BOX:
       return { ...state, newBox: action.payload };

@@ -8,7 +8,7 @@ import {
   FLASH_ALERT_ONSCREEN_TIME
 } from '../../constants';
 import { getBucketImageList, uploadJSONToBucket, downloadJSONFromBucket } from '../../util/io';
-import { loadImage, clearImage, loadLabelConfig } from '../../actions';
+import { loadImage, clearImage, revertImage, loadLabelConfig } from '../../actions';
 import { connect } from 'react-redux';
 import './App.css';
 
@@ -209,6 +209,14 @@ class App extends Component {
     );
   }
 
+  revertCurrentImage() {
+    if (this.isCurrentImageClean()) {
+      return;
+    }
+
+    this.props.action.revertImage();
+  }
+
   isCurrentImageClean() {
     const { prevBoxes, boxes } = this.props.image;
 
@@ -265,13 +273,21 @@ class App extends Component {
           </button>
 
           <button
-            className="App__SaveButton"
+            className="App__Button App__Button--Primary"
             disabled={this.state.isCurrentImageClean}
             onClick={e => this.saveCurrentImage()}
           >
             {this.state.isSaved && '👌 All done'}
 
-            {!this.state.isSaved && (this.state.isSaving ? 'Saving...': 'Save image')}
+            {!this.state.isSaved && (this.state.isSaving ? 'Saving...': 'Save')}
+          </button>
+
+          <button
+            className="App__Button App__Button--Danger"
+            disabled={this.state.isCurrentImageClean || this.state.isSaving}
+            onClick={e => this.revertCurrentImage()}
+          >
+            Revert
           </button>
         </div>
 
@@ -304,7 +320,8 @@ const mapDispatchToProps = (dispatch) => ({
   action: {
     loadLabelConfig: (config) => dispatch(loadLabelConfig(config)),
     loadImage: (boxes, history) => dispatch(loadImage(boxes, history)),
-    clearImage: (boxes) => dispatch(clearImage(boxes)),
+    clearImage: () => dispatch(clearImage()),
+    revertImage: () => dispatch(revertImage()),
   }
 });
 

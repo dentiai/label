@@ -50,13 +50,11 @@
   margin-right: 10px;
 }
 
-.App__SaveButton {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.App__Button {
+  box-sizing: border-box;
   width: 8em;
-  height: 2em;
+  height: 2.2em;
+  line-height: 1.4;
   font-size: 14px;
   background-color: #666;
   color: #fff;
@@ -64,9 +62,22 @@
   border-radius: 4px;
   cursor: pointer;
 }
-.App__SaveButton[disabled] {
+.App__Button + .App__Button {
+  margin-left: 10px;
+}
+.App__Button[disabled] {
   cursor: not-allowed;
   opacity: 0.4;
+}
+
+/* Button variants */
+.App__Button--Primary {
+  background-color: #3D98AA;
+  border-color: #4EA4B5;
+}
+.App__Button--Danger {
+  background-color: #B6342B;
+  border-color: #C23E34;
 }
 
 .App__Image {
