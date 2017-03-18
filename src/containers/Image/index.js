@@ -95,12 +95,9 @@ class Image extends Component {
 
     this.drawState = drawState.default;
 
-    const { startX, startY, endX, endY } = this.props.image.newBox;
+    const boxStyle = this.getCSSForBoxWithDimensions(this.props.image.newBox);
 
-    const newBoxWidth = endX - startX;
-    const newBoxHeight = endY - startY;
-
-    if (newBoxWidth < MIN_BOX_WIDTH || newBoxHeight < MIN_BOX_HEIGHT) {
+    if (boxStyle.width < MIN_BOX_WIDTH || boxStyle.height < MIN_BOX_HEIGHT) {
       this.props.action.clearNewBox();
     } else {
       this.props.action.addNewBox();
@@ -228,6 +225,11 @@ class Image extends Component {
       default: return;
     }
 
+    // don't cross the streams! (prevent resizing past box edges)
+    if (box.startX >= box.endX || box.startY >= box.endY) {
+      return;
+    }
+
     this.props.action.updateBoxAtIndex(this.editingBoxIndex, box);
   }
 
@@ -238,6 +240,32 @@ class Image extends Component {
       x: event.nativeEvent.pageX - imageBoundingRect.left - window.scrollX,
       y: event.nativeEvent.pageY - imageBoundingRect.top - window.scrollY,
     };
+  }
+
+  getCSSForBoxWithDimensions(dimensions) {
+    const boxStyle = {};
+
+    // we handle drawing starting at any corner of the rectangle (box) and
+    // convert the x,y dimensions to CSS properties
+    if (dimensions.startX <= dimensions.endX) {
+      boxStyle.left = dimensions.startX;
+      boxStyle.width = dimensions.endX - dimensions.startX;
+    } else {
+      boxStyle.left = dimensions.endX;
+      boxStyle.width = dimensions.startX - dimensions.endX;
+    }
+
+    if (dimensions.startY <= dimensions.endY) {
+      boxStyle.top = dimensions.startY;
+      boxStyle.height = dimensions.endY - dimensions.startY;
+    } else {
+      boxStyle.top = dimensions.endY;
+      boxStyle.height = dimensions.startY - dimensions.endY;
+    }
+
+    boxStyle.maxHeight = boxStyle.height;
+
+    return boxStyle;
   }
 
   resetEditingBox() {
@@ -267,27 +295,7 @@ class Image extends Component {
   }
 
   renderBox(dimensions, index = null, additionalClassName = '') {
-    let boxStyle = {};
-
-    // we handle drawing starting at any corner of the rectangle (box) and
-    // convert the x,y dimensions to CSS properties
-    if (dimensions.startX <= dimensions.endX) {
-      boxStyle.left = dimensions.startX;
-      boxStyle.width = dimensions.endX - dimensions.startX;
-    } else {
-      boxStyle.left = dimensions.endX;
-      boxStyle.width = dimensions.startX - dimensions.endX;
-    }
-
-    if (dimensions.startY <= dimensions.endY) {
-      boxStyle.top = dimensions.startY;
-      boxStyle.height = dimensions.endY - dimensions.startY;
-    } else {
-      boxStyle.top = dimensions.endY;
-      boxStyle.height = dimensions.startY - dimensions.endY;
-    }
-
-    boxStyle.maxHeight = boxStyle.height;
+    const boxStyle = this.getCSSForBoxWithDimensions(dimensions);
 
     return (
       <div className={`Image__Box ${additionalClassName} ` + (index === this.editingBoxIndex ? `Image__Box--${this.drawState}` : '')}
