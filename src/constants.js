@@ -9,3 +9,7 @@ export const CHECK_IMAGE_DIRTY_INTERVAL = 500;
 
 // in milliseconds
 export const FLASH_ALERT_ONSCREEN_TIME = 1000;
+
+// in pixels
+export const MIN_BOX_WIDTH = 5;
+export const MIN_BOX_HEIGHT = 5;
