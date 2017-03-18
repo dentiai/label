@@ -5,6 +5,7 @@ import {
   CLEAR_IMAGE,
   DRAW_NEW_BOX,
   ADD_NEW_BOX,
+  CLEAR_NEW_BOX,
   UPDATE_BOX,
   DELETE_BOX,
   ADD_BOX_LABEL,
@@ -43,6 +44,9 @@ export default (state = INIT_STATE, action) => {
       boxes.push(state.newBox);
 
       return { ...state, boxes, newBox: null };
+
+    case CLEAR_NEW_BOX:
+      return { ...state, newBox: null };
 
     case UPDATE_BOX:
       boxes[action.payload.index] = { ...boxes[action.payload.index], ...action.payload.newDimensions };

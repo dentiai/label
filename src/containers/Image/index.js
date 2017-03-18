@@ -3,11 +3,13 @@ import { connect } from 'react-redux';
 import {
   drawNewBox,
   addNewBox,
+  clearNewBox,
   updateBoxAtIndex,
   deleteBoxAtIndex,
 } from '../../actions';
 import EditLabels from '../EditLabels';
 import ShowLabels from '../../components/ShowLabels';
+import { MIN_BOX_WIDTH, MIN_BOX_HEIGHT } from '../../constants';
 import './Image.css';
 
 const drawState = {
@@ -93,7 +95,16 @@ class Image extends Component {
 
     this.drawState = drawState.default;
 
-    this.props.action.addNewBox();
+    const { startX, startY, endX, endY } = this.props.image.newBox;
+
+    const newBoxWidth = endX - startX;
+    const newBoxHeight = endY - startY;
+
+    if (newBoxWidth < MIN_BOX_WIDTH || newBoxHeight < MIN_BOX_HEIGHT) {
+      this.props.action.clearNewBox();
+    } else {
+      this.props.action.addNewBox();
+    }
   }
 
   onMouseDownOnBox(event, index) {
@@ -365,6 +376,7 @@ const mapDispatchToProps = (dispatch) => ({
   action: {
     drawNewBox: (dimensions) => dispatch(drawNewBox(dimensions)),
     addNewBox: () => dispatch(addNewBox()),
+    clearNewBox: () => dispatch(clearNewBox()),
     updateBoxAtIndex: (index, dimensions) => dispatch(updateBoxAtIndex(index, dimensions)),
     deleteBoxAtIndex: (index) => dispatch(deleteBoxAtIndex(index)),
   }

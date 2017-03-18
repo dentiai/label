@@ -3,6 +3,8 @@ export const CLEAR_IMAGE              = 'CLEAR_IMAGE';
 
 export const DRAW_NEW_BOX             = 'DRAW_NEW_BOX';
 export const ADD_NEW_BOX              = 'ADD_NEW_BOX';
+export const CLEAR_NEW_BOX            = 'CLEAR_NEW_BOX';
+
 export const UPDATE_BOX               = 'UPDATE_BOX';
 export const DELETE_BOX               = 'DELETE_BOX';
 
@@ -125,6 +127,8 @@ export const addNewBox = () => {
     });
   };
 };
+
+export const clearNewBox = () => ({ type: CLEAR_NEW_BOX });
 
 export const updateBoxAtIndex = (index, newDimensions) => ({
   type: UPDATE_BOX,
