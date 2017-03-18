@@ -47,7 +47,24 @@ export default (state = INIT_STATE, action) => {
       return { ...state, newBox: action.payload };
 
     case ADD_NEW_BOX:
-      boxes.push(state.newBox);
+      const { startX, startY, endX, endY } = state.newBox;
+
+      // normalize box dimensions so that the end corner dimensions are always
+      // greater in value than the start corner dimensions
+      if (startX > endX) {
+        [startX, endX] = [endX, startX];
+      }
+      if (startY > endY) {
+        [startY, endY] = [endY, startY];
+      }
+
+      const newBox = { startX, startY, endX, endY };
+
+      if (state.newBox.labels) {
+        newBox.labels = state.newBox.labels;
+      }
+
+      boxes.push(newBox);
 
       return { ...state, boxes, newBox: null };
 
