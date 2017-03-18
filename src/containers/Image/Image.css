@@ -44,40 +44,34 @@
   cursor: move;
 }
 
-.Image__Box__DragArea {
+.Image__Box__Resizer {
   position: absolute;
   display: none;
-  justify-content: center;
-  align-items: center;
   z-index: 2;
-  bottom: -1px;
-  right: -1px;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 0 20px 20px;
-  color: #042E5A;
-  border-color: transparent transparent #007bff transparent;
+  width: 13px;
+  height: 13px;
+  background-color: #C2F5FF;
+  border-radius: 50%;
+  box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
-.Image__Box:hover .Image__Box__DragArea,
-.Image__Box--resizing .Image__Box__DragArea {
-  display: flex;
+.Image__Box:hover .Image__Box__Resizer,
+.Image__Box--resizing .Image__Box__Resizer {
+  display: block;
 }
-.Image__Box--moving .Image__Box__DragArea {
+.Image__Box--moving .Image__Box__Resizer {
   display: none !important;
 }
 
-.Image__Box__DragArea:hover {
+/* Resizer variants */
+.Image__Box__Resizer--NW {
+  top: -7px;
+  left: -7px;
   cursor: nwse-resize;
 }
-.Image__Box__DragArea::before {
-  content: "…";
-  display: block;
-  position: absolute;
-  transform: rotate(-45deg);
-  top: 4px;
-  left: -14px;
-  font-size: 11px;
+.Image__Box__Resizer--SE {
+  bottom: -7px;
+  right: -7px;
+  cursor: nwse-resize;
 }
 
 .Image__Box__DeleteButton {
@@ -90,14 +84,15 @@
   z-index: 3;
   width: 17px;
   height: 17px;
-  top: -5px;
-  right: -5px;
+  top: -8px;
+  right: -8px;
   background-color: #FC4537;
   color: #3D1511;
   cursor: pointer;
   text-align: center;
   border: 1px solid #3D1511;
   border-radius: 50%;
+  box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
 .Image__Box:hover .Image__Box__DeleteButton {
   display: flex;
@@ -135,6 +130,7 @@
   border: 1px solid black;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
 .Image__Box:hover .Image__Box__AddEditButton {
   display: flex;

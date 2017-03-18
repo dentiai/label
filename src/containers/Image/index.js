@@ -17,6 +17,11 @@ const drawState = {
   resizing: 'resizing',
 };
 
+const resizingDirection = {
+  northWest: 'northWest',
+  southEast: 'southEast',
+};
+
 class Image extends Component {
 
   constructor(props) {
@@ -25,6 +30,8 @@ class Image extends Component {
     this.imageElement = null;
 
     this.drawState = drawState.default;
+
+    this.resizingDirection = null;
 
     this.editingBoxIndex = null;
 
@@ -72,13 +79,7 @@ class Image extends Component {
         return;
 
       case drawState.resizing:
-        const box = this.props.image.boxes[this.editingBoxIndex];
-
-        box.endX = mouseCoordinates.x;
-        box.endY = mouseCoordinates.y;
-
-        this.props.action.updateBoxAtIndex(this.editingBoxIndex, box);
-
+        this.resizeEditingBoxWithMouseCoordinates(mouseCoordinates);
         return;
 
       default: return;
@@ -154,7 +155,7 @@ class Image extends Component {
     this.drawState = drawState.default;
   }
 
-  onMouseDownOnResizer(event, index) {
+  onMouseDownOnResizer(event, index, resizingDirection) {
     if(this.drawState !== drawState.default) {
       return;
     }
@@ -162,6 +163,8 @@ class Image extends Component {
     event.stopPropagation();
 
     this.editingBoxIndex = index;
+
+    this.resizingDirection = resizingDirection;
 
     this.drawState = drawState.resizing;
   }
@@ -191,6 +194,32 @@ class Image extends Component {
     });
   }
 
+  resizeEditingBoxWithMouseCoordinates(mouseCoordinates) {
+    if (this.resizingDirection === null) {
+      return;
+    }
+
+    const box = this.props.image.boxes[this.editingBoxIndex];
+
+    switch (this.resizingDirection) {
+      case resizingDirection.northWest:
+        box.startX = mouseCoordinates.x;
+        box.startY = mouseCoordinates.y;
+
+        break;
+
+      case resizingDirection.southEast:
+        box.endX = mouseCoordinates.x;
+        box.endY = mouseCoordinates.y;
+
+        break;
+
+      default: return;
+    }
+
+    this.props.action.updateBoxAtIndex(this.editingBoxIndex, box);
+  }
+
   getImageMouseCoordinatesFromMouseEvent(event) {
     const imageBoundingRect = this.imageElement.getBoundingClientRect();
 
@@ -203,8 +232,27 @@ class Image extends Component {
   resetEditingBox() {
     this.editingBoxIndex = null;
 
+    this.resizingDirection = null;
+
     this.mouseBoxDeltaX = null;
     this.mouseBoxDeltaY = null;
+  }
+
+  renderResizers(index) {
+    return (
+      <div className="ImageBox__Resizers">
+        <div className="Image__Box__Resizer Image__Box__Resizer--NW"
+             onMouseDown={e => this.onMouseDownOnResizer(e, index, resizingDirection.northWest)}
+             onMouseMove={e => this.onMouseMoveOnImage(e)}
+             onMouseUp={e => this.onMouseUpFromResizer(e)}
+        />
+        <div className="Image__Box__Resizer Image__Box__Resizer--SE"
+             onMouseDown={e => this.onMouseDownOnResizer(e, index, resizingDirection.southEast)}
+             onMouseMove={e => this.onMouseMoveOnImage(e)}
+             onMouseUp={e => this.onMouseUpFromResizer(e)}
+        />
+      </div>
+    );
   }
 
   renderBox(dimensions, index = null, additionalClassName = '') {
@@ -242,11 +290,7 @@ class Image extends Component {
              onClick={e => this.props.action.deleteBoxAtIndex(index)}
         />
 
-        <div className="Image__Box__DragArea"
-             onMouseDown={e => this.onMouseDownOnResizer(e, index)}
-             onMouseMove={e => this.onMouseMoveOnImage(e)}
-             onMouseUp={e => this.onMouseUpFromResizer(e)}
-        />
+        {this.renderResizers(index)}
 
         <div className="Image__Box__AddEditButton"
              onClick={e => this.onClickAddEditButton(e, index)}
