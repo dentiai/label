@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { parseString } from 'xml2js';
-import { S3_BUCKET_URL } from '../constants';
+import { S3_BUCKET_URL, LABEL_CONFIG_FILE_URL } from '../constants';
 
 /**
  * Generates an array of image object URLs from our S3 Bucket representation.
@@ -30,9 +30,13 @@ const extractImageListFromBucket = (bucket) => {
  * @param {string} fileName
  * @return {string}
  */
-const getAbsoluteFileUrlFromFileName = (fileName)  => (
-  fileName.startsWith(S3_BUCKET_URL) ? fileName : `${S3_BUCKET_URL}/${fileName}`
-)
+const getAbsoluteFileUrlFromFileName = (fileName) => {
+  if (fileName === LABEL_CONFIG_FILE_URL || fileName.startsWith(S3_BUCKET_URL)) {
+      return fileName;
+  } else {
+      return S3_BUCKET_URL + '/' + fileName;
+  }
+};
 
 /**
  * Retrieves a list of objects within our AWS S3 bucket.

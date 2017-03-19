@@ -47,7 +47,7 @@ export default (state = INIT_STATE, action) => {
       return { ...state, newBox: action.payload };
 
     case ADD_NEW_BOX:
-      const { startX, startY, endX, endY } = state.newBox;
+      let { startX, startY, endX, endY } = state.newBox;
 
       // normalize box dimensions so that the end corner dimensions are always
       // greater in value than the start corner dimensions

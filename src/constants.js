@@ -1,8 +1,14 @@
-export const S3_BUCKET_URL = 'https://s3-eu-west-1.amazonaws.com/d-pan1';
+import {qs} from './util/helpers';
 
-export const APP_URL = `${S3_BUCKET_URL}/label`;
+export const BASE_S3_BUCKET_URL = 'https://s3-eu-west-1.amazonaws.com/';
 
-export const LABEL_CONFIG_FILE_URL = `${APP_URL}/config/label-config.json`;
+export const IMAGES_URL = qs['images'] || 'd-pan1';
+
+export const S3_BUCKET_URL = BASE_S3_BUCKET_URL + IMAGES_URL;
+
+export const APP_URL = BASE_S3_BUCKET_URL + 'd-pan1/label';
+
+export const LABEL_CONFIG_FILE_URL = APP_URL + '/config/label-config.json';
 
 // in milliseconds
 export const CHECK_IMAGE_DIRTY_INTERVAL = 500;

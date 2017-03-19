@@ -1,0 +1,206 @@
+{
+  "currentBoxes": [
+    {
+      "startX": 1344,
+      "startY": 521,
+      "endX": 1454,
+      "endY": 788,
+      "labels": [
+        "11"
+      ]
+    },
+    {
+      "startX": 1270,
+      "startY": 781,
+      "endX": 1383,
+      "endY": 509,
+      "labels": [
+        "12"
+      ]
+    },
+    {
+      "startX": 1185,
+      "startY": 769,
+      "endX": 1287,
+      "endY": 486,
+      "labels": [
+        "13"
+      ]
+    },
+    {
+      "startX": 1561,
+      "startY": 784,
+      "endX": 1445,
+      "endY": 500,
+      "labels": [
+        "21"
+      ]
+    },
+    {
+      "startX": 1456,
+      "startY": 819,
+      "endX": 1529,
+      "endY": 1038,
+      "labels": [
+        "31"
+      ]
+    },
+    {
+      "startX": 1593,
+      "startY": 810,
+      "endX": 1515,
+      "endY": 1048,
+      "labels": [
+        "32"
+      ]
+    },
+    {
+      "startX": 1664,
+      "startY": 800,
+      "endX": 1576,
+      "endY": 1070,
+      "labels": [
+        "33"
+      ]
+    },
+    {
+      "startX": 1738,
+      "startY": 1059,
+      "endX": 1643,
+      "endY": 791,
+      "labels": [
+        "34"
+      ]
+    },
+    {
+      "startX": 2088,
+      "startY": 903,
+      "endX": 1842,
+      "endY": 668,
+      "labels": [
+        "37"
+      ]
+    },
+    {
+      "startX": 2245,
+      "startY": 955,
+      "endX": 2047,
+      "endY": 692,
+      "labels": [
+        "38"
+      ]
+    },
+    {
+      "startX": 1401,
+      "startY": 822,
+      "endX": 1466,
+      "endY": 1050,
+      "labels": [
+        "41"
+      ]
+    },
+    {
+      "startX": 1332,
+      "startY": 818,
+      "endX": 1410,
+      "endY": 1048,
+      "labels": [
+        "42"
+      ]
+    },
+    {
+      "startX": 1243,
+      "startY": 1064,
+      "endX": 1347,
+      "endY": 809,
+      "labels": [
+        "43"
+      ]
+    },
+    {
+      "startX": 1163,
+      "startY": 1063,
+      "endX": 1281,
+      "endY": 785,
+      "labels": [
+        "44"
+      ]
+    },
+    {
+      "startX": 1043,
+      "startY": 1036,
+      "endX": 1222,
+      "endY": 760,
+      "labels": [
+        "45"
+      ]
+    },
+    {
+      "startX": 762,
+      "startY": 892,
+      "endX": 996,
+      "endY": 663,
+      "labels": [
+        "48"
+      ]
+    }
+  ],
+  "history": {
+    "1489866453864": [
+      {
+        "startX": 1344,
+        "startY": 521,
+        "endX": 1454,
+        "endY": 788,
+        "labels": [
+          "11"
+        ]
+      },
+      {
+        "startX": 1270,
+        "startY": 781,
+        "endX": 1383,
+        "endY": 509,
+        "labels": [
+          "12"
+        ]
+      },
+      {
+        "startX": 1185,
+        "startY": 769,
+        "endX": 1287,
+        "endY": 486,
+        "labels": [
+          "13"
+        ]
+      },
+      {
+        "startX": 1561,
+        "startY": 784,
+        "endX": 1445,
+        "endY": 500,
+        "labels": [
+          "21"
+        ]
+      },
+      {
+        "startX": 1456,
+        "startY": 819,
+        "endX": 1529,
+        "endY": 1038,
+        "labels": [
+          "31"
+        ]
+      },
+      {
+        "startX": 1593,
+        "startY": 810,
+        "endX": 1515,
+        "endY": 1048,
+        "labels": [
+          "32"
+        ]
+      }
+    ]
+  }
+}

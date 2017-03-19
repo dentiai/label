@@ -38,29 +38,6 @@
         "37",
         "38"
       ]
-    },
-    {
-      "id": "2",
-      "isSequential": false,
-      "areLabelsMutuallyExclusive": false,
-      "labels": [
-        "Filling",
-        "Caries",
-        "Missing tooth",
-        "Implant w/o crown",
-        "Implant w crown"
-      ]
-    },
-    {
-      "id": "3",
-      "isSequential": false,
-      "areLabelsMutuallyExclusive": true,
-      "labels": [
-        "Praesent",
-        "Non Quam Quis",
-        "Odio Sagittis Lacinia",
-        "Quisque Sit Amet Nisi Vitae Mauris"
-      ]
     }
   ]
 }
