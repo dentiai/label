@@ -38,6 +38,31 @@
         "37",
         "38"
       ]
+    },
+    {
+      "id": "2",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": true,
+      "labels": [
+        "Implant",
+        "Bridge"
+      ]
+    },
+    {
+      "id": "3",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": false,
+      "labels": [
+        "Crown"
+      ]
+    },
+    {
+      "id": "99",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": false,
+      "labels": [
+        "?"
+      ]
     }
   ]
 }

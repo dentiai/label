@@ -22,7 +22,7 @@ const extractImageListFromBucket = (bucket) => {
   });
 
   return list;
-}
+};
 
 /**
  * Returns the absolute URL, prefixed with our Bucket URL, give a file name

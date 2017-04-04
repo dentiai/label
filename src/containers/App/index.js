@@ -255,6 +255,8 @@ class App extends Component {
           </div>
         </Modal>
 
+        {this.state.currentImageUrl}
+
         <div className="App__ControlBar">
           <button
             onClick={() => this.prevImage()}
