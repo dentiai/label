@@ -2,11 +2,11 @@ import {qs} from './util/helpers';
 
 export const BASE_S3_BUCKET_URL = 'https://s3-eu-west-1.amazonaws.com/';
 
-export const IMAGES_URL = qs['images'] || 'd-pan1';
+export const IMAGES_URL = qs['images'] || 'dt-tst';
 
 export const S3_BUCKET_URL = BASE_S3_BUCKET_URL + IMAGES_URL;
 
-export const APP_URL = BASE_S3_BUCKET_URL + 'd-pan1/label';
+export const APP_URL = BASE_S3_BUCKET_URL + 'd-pan';
 
 export const LABEL_CONFIG_FILE_URL = APP_URL + '/config/label-config.json';
 
