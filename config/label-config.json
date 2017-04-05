@@ -4,6 +4,7 @@
       "id": "1",
       "isSequential": true,
       "areLabelsMutuallyExclusive": true,
+      "areLabelsUniqueOnImage": true,
       "labels": [
         "18",
         "17",
@@ -43,6 +44,7 @@
       "id": "2",
       "isSequential": false,
       "areLabelsMutuallyExclusive": true,
+      "areLabelsUniqueOnImage": false,
       "labels": [
         "Implant",
         "Bridge"
@@ -52,6 +54,7 @@
       "id": "3",
       "isSequential": false,
       "areLabelsMutuallyExclusive": false,
+      "areLabelsUniqueOnImage": false,
       "labels": [
         "Crown"
       ]
@@ -60,6 +63,7 @@
       "id": "99",
       "isSequential": false,
       "areLabelsMutuallyExclusive": false,
+      "areLabelsUniqueOnImage": false,
       "labels": [
         "?"
       ]

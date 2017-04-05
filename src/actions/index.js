@@ -41,7 +41,8 @@ export const addLabelForBoxAtIndex = (index, label) => {
 
     // if the label's group is a mutually exclusive group and the label
     // already exist on the image, then the label is invalid
-    if (owningGroup.areLabelsMutuallyExclusive) {
+    // if (owningGroup.areLabelsMutuallyExclusive) {
+    if (owningGroup.areLabelsUniqueOnImage) {
       let doesLabelExistOnImage = false;
 
       for (let i = 0; i < state.image.boxes.length; i++) {
@@ -62,7 +63,7 @@ export const addLabelForBoxAtIndex = (index, label) => {
     }
 
     if (isLabelValid) {
-      // there can only be one member of a mutually exlusive group's labels
+      // there can only be one member of a mutually exclusive group's labels
       // associated with any given box. so we delete all other group members
       // from this box before we add the new label.
       if (owningGroup !== null) {
