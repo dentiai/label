@@ -30,11 +30,11 @@ const direction = {
 
 class App extends Component {
   constructor(props) {
-    console.log('props', props);
     super(props);
     let paramsPhotoId = 0;
 
-    if (props.match) paramsPhotoId = parseInt(props.match.params.photoId);
+    if (props.match.params.photoId)
+      paramsPhotoId = parseInt(props.match.params.photoId, 10);
     this.state = {
       currentImageUrl: null,
       currentImageIndex: paramsPhotoId,
@@ -68,7 +68,7 @@ class App extends Component {
     return nextProps !== this.props;
   }
   componentDidUpdate(prevProps) {
-    const currentImageIndex = parseInt(this.state.currentImageIndex);
+    const currentImageIndex = parseInt(this.state.currentImageIndex, 10);
     this.setAndCheckImageAtIndex(currentImageIndex, false);
     this.setState({ currentImageIndex });
   }
@@ -281,7 +281,6 @@ class App extends Component {
   }
 
   render() {
-    const { currentImageIndex } = this.state;
     return (
       <div className="App">
         <Modal
