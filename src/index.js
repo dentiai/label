@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import rootReducer from './reducers';
 import App from './containers/App';
@@ -16,8 +17,9 @@ const store = createStoreWithMiddleware(
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
-  </Provider>
-  ,
+    <Router>
+      <Route path="/:photoId" children={({ match }) => <App />} />
+    </Router>
+  </Provider>,
   document.getElementById('root')
 );
