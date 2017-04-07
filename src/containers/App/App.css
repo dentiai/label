@@ -37,6 +37,12 @@
   cursor: pointer;
   user-select: none;
 }
+
+.App__NavButton a {
+  color: #fff;
+  text-decoration: none;
+}
+
 .App__NavButton[disabled] {
   cursor: not-allowed;
   opacity: 0.4;
