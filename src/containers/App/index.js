@@ -67,10 +67,12 @@ class App extends Component {
   shouldComponentUpdate(nextProps) {
     return nextProps !== this.props;
   }
-  componentDidUpdate(prevProps) {
-    const currentImageIndex = parseInt(this.state.currentImageIndex, 10);
-    this.setAndCheckImageAtIndex(currentImageIndex, false);
-    this.setState({ currentImageIndex });
+  componentWillUpdate(nextProps) {
+    if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
+      const currentImageIndex = parseInt(nextProps.match.params.photoId, 10);
+      this.setAndCheckImageAtIndex(currentImageIndex, false);
+      this.setState({ currentImageIndex });
+    }
   }
 
   /**
