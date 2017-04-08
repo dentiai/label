@@ -42,6 +42,7 @@ class App extends Component {
       isCurrentImageClean: true,
       showModal: false,
       navAttempt: null,
+      showLabelled: false,
       isSaving: false,
       isSaved: false,
       nextImageUrl: null,
@@ -49,12 +50,17 @@ class App extends Component {
     };
 
     this.list = [];
+    this.mainList = [];
+    this.jsonList = [];
+    this.notLabelledList = [];
   }
 
   componentDidMount() {
-    getBucketImageList(list => {
-      this.list = list;
-
+    getBucketImageList(response => {
+      this.jsonList = response.jsonList;
+      this.mainList = response.list;
+      this.notLabelledList = this.getImageWithoutLabels();
+      this.list = this.mainList;
       this.setAndCheckImageAtIndex(this.state.currentImageIndex, false);
     });
 
@@ -64,17 +70,35 @@ class App extends Component {
 
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   }
-  shouldComponentUpdate(nextProps) {
-    return nextProps !== this.props;
+  getImageWithoutLabels() {
+    Array.prototype.diff = function(a) {
+      return this.filter(function(i) {
+        return a.indexOf(i) < 0;
+      });
+    };
+    const diff = (a, b) => a.filter(i => b.indexOf(i) < 0);
+    return diff(this.mainList, this.jsonList);
   }
-  componentWillUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps !== this.props ||
+      nextState.showLabelled !== this.state.showLabelled;
+  }
+  componentWillUpdate(nextProps, nextState) {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
       const currentImageIndex = parseInt(nextProps.match.params.photoId, 10);
       this.setAndCheckImageAtIndex(currentImageIndex, false);
       this.setState({ currentImageIndex });
     }
+    if (nextState.showLabelled !== this.state.showLabelled) {
+      this.toggleImages();
+    }
   }
-
+  toggleImages() {
+    this.props.history.push('/0');
+    if (!this.state.showLabelled) this.list = this.notLabelledList;
+    else this.list = this.mainList;
+    this.setAndCheckImageAtIndex(0, false);
+  }
   /**
    * Check if image needs saving and update state
    *
@@ -324,7 +348,16 @@ class App extends Component {
               &rarr;
             </Link>
           </button>
+          <button
+            onClick={() =>
+              this.setState(prevState => {
+                return { showLabelled: !prevState.showLabelled };
+              })}
+          >
+            {!this.state.showLabelled ? 'Show Not Labelled' : 'Show Labelled'}
 
+          </button>
+          <div>{this.jsonList.length}/{this.mainList.length}</div>
           <button
             className="App__Button App__Button--Primary"
             disabled={this.state.isCurrentImageClean}

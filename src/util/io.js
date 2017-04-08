@@ -8,20 +8,24 @@ import { S3_BUCKET_URL, LABEL_CONFIG_FILE_URL } from '../constants';
  * @param {object} xml2js AWS S3 bucket object representation
  * @return {array}
  */
-const extractImageListFromBucket = (bucket) => {
+const extractImageListFromBucket = bucket => {
   const list = [];
+  const jsonList = [];
   const bucketContents = bucket.ListBucketResult.Contents;
 
-  bucketContents.forEach((object) => {
+  bucketContents.forEach(object => {
     const fileName = object.Key[0];
 
     // filter out everything except web images
     if (/\.(gif|jpg|jpeg|png|bmp)$/.test(fileName)) {
       list.push(`${S3_BUCKET_URL}/${fileName}`);
     }
+    if (/\.(json)$/.test(fileName)) {
+      jsonList.push(`${S3_BUCKET_URL}/${fileName.replace(/.json/, '')}`);
+    }
   });
 
-  return list;
+  return { list, jsonList };
 };
 
 /**
@@ -30,11 +34,13 @@ const extractImageListFromBucket = (bucket) => {
  * @param {string} fileName
  * @return {string}
  */
-const getAbsoluteFileUrlFromFileName = (fileName) => {
-  if (fileName === LABEL_CONFIG_FILE_URL || fileName.startsWith(S3_BUCKET_URL)) {
-      return fileName;
+const getAbsoluteFileUrlFromFileName = fileName => {
+  if (
+    fileName === LABEL_CONFIG_FILE_URL || fileName.startsWith(S3_BUCKET_URL)
+  ) {
+    return fileName;
   } else {
-      return S3_BUCKET_URL + '/' + fileName;
+    return S3_BUCKET_URL + '/' + fileName;
   }
 };
 
@@ -44,9 +50,10 @@ const getAbsoluteFileUrlFromFileName = (fileName) => {
  * @param {function} onListReady(list) called when the list (array) is ready
  * @return {void}
  */
-export const getBucketImageList = (onListReady) => {
-  axios.get(`${S3_BUCKET_URL}/?list-type=2`)
-    .then((response) => {
+export const getBucketImageList = onListReady => {
+  axios
+    .get(`${S3_BUCKET_URL}/?list-type=2`)
+    .then(response => {
       parseString(response.data, (error, result) => {
         if (error) {
           alert(error);
@@ -55,7 +62,7 @@ export const getBucketImageList = (onListReady) => {
         }
       });
     })
-    .catch((error) => alert(error));
+    .catch(error => alert(error));
 };
 
 /**
@@ -68,19 +75,15 @@ export const getBucketImageList = (onListReady) => {
 export const uploadJSONToBucket = (fileName, json, onUploaded) => {
   const fileContents = JSON.stringify(json);
 
-  const blob = new Blob([fileContents], {type: "application/json"});
+  const blob = new Blob([fileContents], { type: 'application/json' });
 
   axios
-    .put(
-      getAbsoluteFileUrlFromFileName(fileName),
-      blob,
-      {
-        header: {
-          "Content-Type": "application/json",
-        }
+    .put(getAbsoluteFileUrlFromFileName(fileName), blob, {
+      header: {
+        'Content-Type': 'application/json'
       }
-    )
-    .then(response => typeof onUploaded === "function" && onUploaded())
+    })
+    .then(response => typeof onUploaded === 'function' && onUploaded())
     .catch(error => alert(error));
 };
 
@@ -92,7 +95,14 @@ export const uploadJSONToBucket = (fileName, json, onUploaded) => {
  * @param {function} [onError]
  */
 export const downloadJSONFromBucket = (fileName, onDownloaded, onError) => {
-  axios.get(getAbsoluteFileUrlFromFileName(fileName))
-       .then(response => typeof onDownloaded === "function" && onDownloaded(response.data))
-       .catch(error => typeof onError === "function" ? onError(error) : console.log(error));
+  axios
+    .get(getAbsoluteFileUrlFromFileName(fileName))
+    .then(
+      response =>
+        typeof onDownloaded === 'function' && onDownloaded(response.data)
+    )
+    .catch(
+      error =>
+        typeof onError === 'function' ? onError(error) : console.log(error)
+    );
 };
