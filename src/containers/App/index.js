@@ -32,10 +32,9 @@ const direction = {
 class App extends Component {
   constructor(props) {
     super(props);
-    let paramsPhotoId;
+    let paramsPhotoId = '';
 
-    if (props.match.params.photoId)
-      paramsPhotoId = parseInt(props.match.params.photoId, 10);
+    if (props.match.params.photoId) paramsPhotoId = props.match.params.photoId;
     this.state = {
       currentImageUrl: null,
       currentImageIndex: this.findIndexOfCurrentPhoto(paramsPhotoId),
@@ -63,7 +62,8 @@ class App extends Component {
       this.mainList = response.list;
       this.notLabelledList = this.getImageWithoutLabels();
       this.list = this.mainList;
-      this.setAndCheckImageAtIndex(this.state.currentImageIndex, false);
+      const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
+      this.setAndCheckImageAtIndex(idx, false);
     });
 
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
@@ -73,7 +73,7 @@ class App extends Component {
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   }
   findIndexOfCurrentPhoto = val => {
-    if (this.list) {
+    if (this.list && val) {
       return this.list.indexOf(val);
     }
     return 0;
@@ -103,9 +103,9 @@ class App extends Component {
     }
   }
   toggleImages() {
-    this.props.history.push('/0');
     if (!this.state.showLabelled) this.list = this.notLabelledList;
     else this.list = this.mainList;
+    this.props.history.push(`/${this.list[0]}`);
     this.setAndCheckImageAtIndex(0, false);
   }
   /**
