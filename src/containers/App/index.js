@@ -54,12 +54,14 @@ class App extends Component {
     this.mainList = [];
     this.jsonList = [];
     this.notLabelledList = [];
+    this.nameList = [];
   }
 
   componentDidMount() {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
       this.mainList = response.list;
+      this.nameList = response.nameList;
       this.notLabelledList = this.getImageWithoutLabels();
       this.list = this.mainList;
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
@@ -74,7 +76,7 @@ class App extends Component {
   }
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
-      return this.list.indexOf(val);
+      return this.nameList.indexOf(val);
     }
     return 0;
   };
@@ -94,7 +96,6 @@ class App extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
       const idx = this.findIndexOfCurrentPhoto(nextProps.match.params.photoId);
-      console.log('idx', idx);
       this.setAndCheckImageAtIndex(idx, false);
       this.setState({ currentImageIndex: idx });
     }
@@ -316,7 +317,7 @@ class App extends Component {
   }
   getNextImage(direction) {
     const idx = this.getNextImageIndexGoingIn(direction);
-    return this.list[idx];
+    return this.nameList[idx];
   }
 
   render() {
