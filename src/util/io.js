@@ -18,10 +18,10 @@ const extractImageListFromBucket = bucket => {
 
     // filter out everything except web images
     if (/\.(gif|jpg|jpeg|png|bmp)$/.test(fileName)) {
-      list.push(`${S3_BUCKET_URL}/${fileName}`);
+      list.push(`${fileName}`);
     }
     if (/\.(json)$/.test(fileName)) {
-      jsonList.push(`${S3_BUCKET_URL}/${fileName.replace(/.json/, '')}`);
+      jsonList.push(`${fileName.replace(/.json/, '')}`);
     }
   });
 

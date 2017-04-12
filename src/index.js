@@ -16,7 +16,7 @@ const store = createStoreWithMiddleware(
 );
 ReactDOM.render(
   <Provider store={store}>
-    <Router>
+    <Router basename="/d-pan">
       <Route path="/:photoId?" component={App} />
     </Router>
   </Provider>,
