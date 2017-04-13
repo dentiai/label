@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Image from '../Image';
 import Modal from 'simple-react-modal';
 import {
+  S3_BUCKET_URL,
   LABEL_CONFIG_FILE_URL,
   CHECK_IMAGE_DIRTY_INTERVAL,
   FLASH_ALERT_ONSCREEN_TIME
@@ -31,13 +32,12 @@ const direction = {
 class App extends Component {
   constructor(props) {
     super(props);
-    let paramsPhotoId = 0;
+    let paramsPhotoId = '';
 
-    if (props.match.params.photoId)
-      paramsPhotoId = parseInt(props.match.params.photoId, 10);
+    if (props.match.params.photoId) paramsPhotoId = props.match.params.photoId;
     this.state = {
       currentImageUrl: null,
-      currentImageIndex: paramsPhotoId,
+      currentImageIndex: this.findIndexOfCurrentPhoto(paramsPhotoId),
       hasErroredOnLoad: false,
       isCurrentImageClean: true,
       showModal: false,
@@ -46,22 +46,26 @@ class App extends Component {
       isSaving: false,
       isSaved: false,
       nextImageUrl: null,
-      prevImageUrl: null
+      prevImageUrl: null,
+      paramsPhotoId
     };
 
     this.list = [];
     this.mainList = [];
     this.jsonList = [];
     this.notLabelledList = [];
+    this.nameList = [];
   }
 
   componentDidMount() {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
       this.mainList = response.list;
+      this.nameList = response.nameList;
       this.notLabelledList = this.getImageWithoutLabels();
       this.list = this.mainList;
-      this.setAndCheckImageAtIndex(this.state.currentImageIndex, false);
+      const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
+      this.setAndCheckImageAtIndex(idx, false);
     });
 
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
@@ -70,6 +74,12 @@ class App extends Component {
 
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   }
+  findIndexOfCurrentPhoto = val => {
+    if (this.list && val) {
+      return this.nameList.indexOf(val);
+    }
+    return 0;
+  };
   getImageWithoutLabels() {
     Array.prototype.diff = function(a) {
       return this.filter(function(i) {
@@ -85,18 +95,21 @@ class App extends Component {
   }
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
-      const currentImageIndex = parseInt(nextProps.match.params.photoId, 10);
-      this.setAndCheckImageAtIndex(currentImageIndex, false);
-      this.setState({ currentImageIndex });
+      const idx = this.findIndexOfCurrentPhoto(nextProps.match.params.photoId);
+      this.setAndCheckImageAtIndex(idx, false);
+      this.setState({ currentImageIndex: idx });
     }
     if (nextState.showLabelled !== this.state.showLabelled) {
       this.toggleImages();
     }
   }
   toggleImages() {
-    this.props.history.push('/0');
-    if (!this.state.showLabelled) this.list = this.notLabelledList;
-    else this.list = this.mainList;
+    if (!this.state.showLabelled) {
+      this.list = this.notLabelledList;
+    } else {
+      this.list = this.mainList;
+    }
+    this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
   }
   /**
@@ -136,7 +149,7 @@ class App extends Component {
       this.props.action.clearImage();
     }
 
-    const currentImageUrl = this.list[index];
+    const currentImageUrl = `${S3_BUCKET_URL}/${this.list[index]}`;
 
     const prevImageUrl = this.list[
       this.getNextImageIndexGoingIn(direction.backward, index)
@@ -305,6 +318,10 @@ class App extends Component {
       navAttempt: null
     });
   }
+  getNextImage(direction) {
+    const idx = this.getNextImageIndexGoingIn(direction);
+    return this.nameList[idx];
+  }
 
   render() {
     return (
@@ -333,7 +350,7 @@ class App extends Component {
             className="App__NavButton App__NavButton--Prev"
             disabled={this.state.isSaving}
           >
-            <Link to={`${this.getNextImageIndexGoingIn(direction.backward)}`}>
+            <Link to={`${this.getNextImage('backward')}`}>
               &larr;
             </Link>
 
@@ -344,7 +361,7 @@ class App extends Component {
             className="App__NavButton App__NavButton--Next"
             disabled={this.state.isSaving}
           >
-            <Link to={`${this.getNextImageIndexGoingIn(direction.forward)}`}>
+            <Link to={`${this.getNextImage('forward')}`}>
               &rarr;
             </Link>
           </button>
