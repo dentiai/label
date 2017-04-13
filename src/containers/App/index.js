@@ -104,9 +104,12 @@ class App extends Component {
     }
   }
   toggleImages() {
-    if (!this.state.showLabelled) this.list = this.notLabelledList;
-    else this.list = this.mainList;
-    this.props.history.push(`/${this.list[0]}`);
+    if (!this.state.showLabelled) {
+      this.list = this.notLabelledList;
+    } else {
+      this.list = this.mainList;
+    }
+    this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
   }
   /**
