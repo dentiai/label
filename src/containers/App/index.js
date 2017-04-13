@@ -47,6 +47,7 @@ class App extends Component {
       isSaved: false,
       nextImageUrl: null,
       prevImageUrl: null,
+      showLabels: true,
       paramsPhotoId
     };
 
@@ -89,8 +90,7 @@ class App extends Component {
     return diff(this.mainList, this.jsonList);
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps !== this.props ||
-      nextState.showLabelled !== this.state.showLabelled;
+    return nextProps !== this.props || nextState !== this.state;
   }
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
@@ -321,7 +321,11 @@ class App extends Component {
     const idx = this.getNextImageIndexGoingIn(direction);
     return this.list[idx];
   }
-
+  toggleLabel = () => {
+    this.setState(prevState => {
+      return { showLabels: !prevState.showLabels };
+    });
+  };
   render() {
     return (
       <div className="App">
@@ -364,6 +368,9 @@ class App extends Component {
               &rarr;
             </Link>
           </button>
+          <button onClick={() => this.toggleLabel()}>
+            toggle labels
+          </button>
           <button
             onClick={() =>
               this.setState(prevState => {
@@ -399,6 +406,7 @@ class App extends Component {
             <Image
               url={this.state.currentImageUrl}
               error={this.state.hasErroredOnLoad}
+              showLabels={this.state.showLabels}
             />}
         </div>
 
