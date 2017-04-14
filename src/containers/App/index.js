@@ -51,7 +51,6 @@ class App extends Component {
       paramsPhotoId
     };
 
-    this.list = [];
     this.mainList = [];
     this.jsonList = [];
     this.notLabelledList = [];
@@ -346,8 +345,6 @@ class App extends Component {
           </div>
         </Modal>
 
-        {this.statecurrentImageUrl}
-
         <div className="App__ControlBar">
           <button
             className="App__NavButton App__NavButton--Prev"
@@ -369,7 +366,7 @@ class App extends Component {
             </Link>
           </button>
           <button onClick={() => this.toggleLabel()}>
-            toggle labels
+            Toggle Labels
           </button>
           <button
             onClick={() =>
