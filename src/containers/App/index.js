@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 import Image from '../Image';
 import Modal from 'simple-react-modal';
@@ -57,7 +57,17 @@ class App extends Component {
     this.list = [];
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
+    this.getAllData();
+
+    downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
+      this.props.action.loadLabelConfig(config);
+    });
+
+    setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
+  };
+
+  getAllData = () => {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
       this.mainList = response.list;
@@ -66,13 +76,7 @@ class App extends Component {
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
       this.setAndCheckImageAtIndex(idx, false);
     });
-
-    downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
-      this.props.action.loadLabelConfig(config);
-    });
-
-    setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
-  }
+  };
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
       return this.list.indexOf(val);
@@ -80,11 +84,6 @@ class App extends Component {
     return 0;
   };
   getImageWithoutLabels() {
-    Array.prototype.diff = function(a) {
-      return this.filter(function(i) {
-        return a.indexOf(i) < 0;
-      });
-    };
     const diff = (a, b) => a.filter(i => b.indexOf(i) < 0);
     return diff(this.mainList, this.jsonList);
   }
@@ -266,6 +265,7 @@ class App extends Component {
       this.getJSONFileNameForImage(this.state.currentImageUrl),
       { currentBoxes, history },
       () => {
+        this.getAllData();
         this.setState({ isSaved: true });
 
         setTimeout(
@@ -328,6 +328,9 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        {this.list[0] &&
+          !this.props.match.params.photoId &&
+          <Redirect to={`/${this.list[0]}`} />}
         <Modal
           show={this.state.showModal}
           containerStyle={{ borderRadius: '4px' }}
