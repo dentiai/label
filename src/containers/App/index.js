@@ -47,21 +47,20 @@ class App extends Component {
       isSaved: false,
       nextImageUrl: null,
       prevImageUrl: null,
+      showLabels: true,
       paramsPhotoId
     };
 
-    this.list = [];
     this.mainList = [];
     this.jsonList = [];
     this.notLabelledList = [];
-    this.nameList = [];
+    this.list = [];
   }
 
   componentDidMount() {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
       this.mainList = response.list;
-      this.nameList = response.nameList;
       this.notLabelledList = this.getImageWithoutLabels();
       this.list = this.mainList;
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
@@ -76,7 +75,7 @@ class App extends Component {
   }
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
-      return this.nameList.indexOf(val);
+      return this.list.indexOf(val);
     }
     return 0;
   };
@@ -90,8 +89,7 @@ class App extends Component {
     return diff(this.mainList, this.jsonList);
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps !== this.props ||
-      nextState.showLabelled !== this.state.showLabelled;
+    return nextProps !== this.props || nextState !== this.state;
   }
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
@@ -104,9 +102,12 @@ class App extends Component {
     }
   }
   toggleImages() {
-    if (!this.state.showLabelled) this.list = this.notLabelledList;
-    else this.list = this.mainList;
-    this.props.history.push(`/${this.list[0]}`);
+    if (!this.state.showLabelled) {
+      this.list = this.notLabelledList;
+    } else {
+      this.list = this.mainList;
+    }
+    this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
   }
   /**
@@ -317,9 +318,13 @@ class App extends Component {
   }
   getNextImage(direction) {
     const idx = this.getNextImageIndexGoingIn(direction);
-    return this.nameList[idx];
+    return this.list[idx];
   }
-
+  toggleLabel = () => {
+    this.setState(prevState => {
+      return { showLabels: !prevState.showLabels };
+    });
+  };
   render() {
     return (
       <div className="App">
@@ -340,8 +345,6 @@ class App extends Component {
           </div>
         </Modal>
 
-        {this.statecurrentImageUrl}
-
         <div className="App__ControlBar">
           <button
             className="App__NavButton App__NavButton--Prev"
@@ -361,6 +364,9 @@ class App extends Component {
             <Link to={`${this.getNextImage('forward')}`}>
               &rarr;
             </Link>
+          </button>
+          <button onClick={() => this.toggleLabel()}>
+            Toggle Labels
           </button>
           <button
             onClick={() =>
@@ -397,6 +403,7 @@ class App extends Component {
             <Image
               url={this.state.currentImageUrl}
               error={this.state.hasErroredOnLoad}
+              showLabels={this.state.showLabels}
             />}
         </div>
 
