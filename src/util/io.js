@@ -11,6 +11,7 @@ import { S3_BUCKET_URL, LABEL_CONFIG_FILE_URL } from '../constants';
 const extractImageListFromBucket = bucket => {
   const list = [];
   const jsonList = [];
+  const nameList = [];
   const bucketContents = bucket.ListBucketResult.Contents;
 
   bucketContents.forEach(object => {
@@ -18,14 +19,15 @@ const extractImageListFromBucket = bucket => {
 
     // filter out everything except web images
     if (/\.(gif|jpg|jpeg|png|bmp)$/.test(fileName)) {
-      list.push(`${S3_BUCKET_URL}/${fileName}`);
+      list.push(`${fileName}`);
+      nameList.push(`${fileName.replace(/\.(gif|jpg|jpeg|png|bmp)$/, '')}`);
     }
     if (/\.(json)$/.test(fileName)) {
-      jsonList.push(`${S3_BUCKET_URL}/${fileName.replace(/.json/, '')}`);
+      jsonList.push(`${fileName.replace(/.json/, '')}`);
     }
   });
 
-  return { list, jsonList };
+  return { list, jsonList, nameList };
 };
 
 /**
