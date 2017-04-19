@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import moment from 'moment';
+
 import { Link, Redirect } from 'react-router-dom';
 
 import Image from '../Image';
@@ -263,7 +265,11 @@ class App extends Component {
 
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
-      { currentBoxes, history },
+      {
+        currentBoxes,
+        history,
+        lastUpdate: moment().format('MMMM Do YYYY, h:mm:ss a')
+      },
       () => {
         this.getAllData();
         this.setState({ isSaved: true });
