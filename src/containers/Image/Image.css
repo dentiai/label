@@ -40,7 +40,6 @@
 }
 .Image__Box:hover,
 .Image__Box.clicked,
-.Image__Box.clicked,
 .Image__Box--Editing {
   border-color: #60E4FF;
   cursor: move;
