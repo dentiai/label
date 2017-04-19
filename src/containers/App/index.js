@@ -35,7 +35,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     let paramsPhotoId = '';
-
     if (props.match.params.photoId) paramsPhotoId = props.match.params.photoId;
     this.state = {
       currentImageUrl: null,
@@ -268,7 +267,7 @@ class App extends Component {
       {
         currentBoxes,
         history,
-        lastUpdate: moment().format('MMMM Do YYYY, h:mm:ss a')
+        lastUpdate: moment.utc().format('MMMM Do YYYY, h:mm:ss a')
       },
       () => {
         this.getAllData();
