@@ -45,6 +45,7 @@ class Image extends Component {
   }
 
   onMouseDownOnImage(event) {
+    this.setState({ clikedImage: null });
     if (this.drawState !== drawState.default) {
       return;
     }
@@ -301,18 +302,22 @@ class Image extends Component {
     );
   }
 
+  toggleImageClass = val => {
+    this.setState({ clikedImage: val });
+  };
   renderBox(dimensions, index = null, additionalClassName = '') {
     const boxStyle = this.getCSSForBoxWithDimensions(dimensions);
 
     return (
       <div
         className={
-          `Image__Box ${additionalClassName} ` +
+          `Image__Box number-${index} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
             (index === this.editingBoxIndex
               ? `Image__Box--${this.drawState}`
               : '')
         }
         key={index}
+        onClick={() => this.toggleImageClass(index)}
         onMouseDown={e => this.onMouseDownOnBox(e, index)}
         onMouseMove={e => this.onMouseMoveOnBox(e)}
         onMouseUp={e => this.onMouseUpFromBox(e)}
