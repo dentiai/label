@@ -152,3 +152,11 @@
 .Image__Box--resizing .Image__Box__ShowLabels {
   display: none !important;
 }
+
+.hidden .Image__Box {
+  opacity: 0;
+}
+
+.hidden .Image__Box:hover {
+  opacity: 1;
+}

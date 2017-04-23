@@ -350,11 +350,11 @@ class Image extends Component {
 
   renderImage() {
     return (
-      <div className="Image__Image">
+      <div className={`Image__Image ${this.props.showLabels ? '' : 'hidden'}`}>
         <img
           role="presentation"
           src={this.props.url}
-          ref={img => this.imageElement = img}
+          ref={img => (this.imageElement = img)}
           draggable="false"
         />
 
@@ -365,10 +365,9 @@ class Image extends Component {
             'Image___Box--Bordered'
           )}
 
-        {this.props.showLabels
-          ? this.props.image.boxes.map((dimensions, index) =>
-              this.renderBox(dimensions, index))
-          : null}
+        {this.props.image.boxes.map((dimensions, index) =>
+          this.renderBox(dimensions, index)
+        )}
       </div>
     );
   }
