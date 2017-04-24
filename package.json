@@ -7,7 +7,10 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "moment": "^2.15.1",
     "react": "^15.4.2",
+    "react-addons-shallow-compare": "^15.5.2",
+    "react-dates": "^10.1.1",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
     "react-router-dom": "^4.0.0",

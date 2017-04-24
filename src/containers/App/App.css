@@ -89,3 +89,18 @@
 .App__Image {
   margin-top: 52px;
 }
+.DateRangePickerInput {
+  border: 0;
+  background: none;
+}
+.DateInput {
+  width: inherit;
+  line-height: 12px;
+  font-size: 12px;
+  padding: 0;
+  color: #fff;
+  background: none;
+}
+.DateInput__display-text--has-input {
+  color: #fff;
+}

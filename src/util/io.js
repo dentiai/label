@@ -27,7 +27,7 @@ const extractImageListFromBucket = bucket => {
     }
   });
 
-  return { list, jsonList, nameList };
+  return { list, jsonList, nameList, bucketContents };
 };
 
 /**
@@ -38,7 +38,8 @@ const extractImageListFromBucket = bucket => {
  */
 const getAbsoluteFileUrlFromFileName = fileName => {
   if (
-    fileName === LABEL_CONFIG_FILE_URL || fileName.startsWith(S3_BUCKET_URL)
+    fileName === LABEL_CONFIG_FILE_URL ||
+    fileName.startsWith(S3_BUCKET_URL)
   ) {
     return fileName;
   } else {
@@ -105,6 +106,6 @@ export const downloadJSONFromBucket = (fileName, onDownloaded, onError) => {
     )
     .catch(
       error =>
-        typeof onError === 'function' ? onError(error) : console.log(error)
+        (typeof onError === 'function' ? onError(error) : console.log(error))
     );
 };

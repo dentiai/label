@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Link, Redirect } from 'react-router-dom';
+import {
+  DateRangePicker,
+  SingleDatePicker,
+  DayPickerRangeController
+} from 'react-dates';
+
+import 'react-dates/lib/css/_datepicker.css';
 
 import Image from '../Image';
 import Modal from 'simple-react-modal';
@@ -48,6 +55,7 @@ class App extends Component {
       nextImageUrl: null,
       prevImageUrl: null,
       showLabels: true,
+      bucketContents: {},
       paramsPhotoId
     };
 
@@ -75,8 +83,18 @@ class App extends Component {
       this.list = this.mainList;
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
       this.setAndCheckImageAtIndex(idx, false);
+      this.getMinAndMaxValues(response.bucketContents);
+      this.setState({ bucketContents: response.bucketContents });
     });
   };
+  getMinAndMaxValues(val) {
+    console.log('val', val);
+    let arr = Object.values(val.LastModified);
+    // let min = Math.min(...arr.LastModified);
+    console.log('arr', arr);
+    // let max = Math.max(...arr.LastModified);
+    // this.setState({ startDate: min, endDate: max });
+  }
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
       return this.list.indexOf(val);
@@ -268,18 +286,15 @@ class App extends Component {
         this.getAllData();
         this.setState({ isSaved: true });
 
-        setTimeout(
-          () => {
-            this.setState({
-              isSaving: false,
-              isSaved: false,
-              isCurrentImageClean: true
-            });
+        setTimeout(() => {
+          this.setState({
+            isSaving: false,
+            isSaved: false,
+            isCurrentImageClean: true
+          });
 
-            this.props.action.loadImage(currentBoxes, history);
-          },
-          FLASH_ALERT_ONSCREEN_TIME
-        );
+          this.props.action.loadImage(currentBoxes, history);
+        }, FLASH_ALERT_ONSCREEN_TIME);
       }
     );
   }
@@ -380,6 +395,17 @@ class App extends Component {
             {!this.state.showLabelled ? 'Show Not Labelled' : 'Show Labelled'}
 
           </button>
+          <div>
+            <small>filter labelled by date: </small>
+            <DateRangePicker
+              startDate={this.state.startDate}
+              endDate={this.state.endDate}
+              onDatesChange={({ startDate, endDate }) =>
+                this.setState({ startDate, endDate })}
+              focusedInput={this.state.focusedInput}
+              onFocusChange={focusedInput => this.setState({ focusedInput })}
+            />
+          </div>
           <div>{this.jsonList.length}/{this.mainList.length}</div>
           <button
             className="App__Button App__Button--Primary"
