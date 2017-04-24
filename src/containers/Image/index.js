@@ -303,7 +303,14 @@ class Image extends Component {
   }
 
   toggleImageClass = val => {
-    this.setState({ clikedImage: val });
+    this.setState(prevState => {
+      return {
+        clikedImage: val,
+        isEditingLabelsForBoxIndex: prevState.isEditingLabelsForBoxIndex === val
+          ? val
+          : null
+      };
+    });
   };
   renderBox(dimensions, index = null, additionalClassName = '') {
     const boxStyle = this.getCSSForBoxWithDimensions(dimensions);
@@ -359,7 +366,7 @@ class Image extends Component {
         <img
           role="presentation"
           src={this.props.url}
-          ref={img => this.imageElement = img}
+          ref={img => (this.imageElement = img)}
           draggable="false"
         />
 
@@ -372,7 +379,8 @@ class Image extends Component {
 
         {this.props.showLabels
           ? this.props.image.boxes.map((dimensions, index) =>
-              this.renderBox(dimensions, index))
+              this.renderBox(dimensions, index)
+            )
           : null}
       </div>
     );

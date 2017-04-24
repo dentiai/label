@@ -43,6 +43,11 @@
 .Image__Box--Editing {
   border-color: #60E4FF;
   cursor: move;
+  z-index: 99;
+}
+
+.Image__Box.clicked {
+  z-index: 999;
 }
 
 .Image__Box__Resizer {
