@@ -56,7 +56,9 @@
       "areLabelsMutuallyExclusive": false,
       "areLabelsUniqueOnImage": false,
       "labels": [
-        "Crown"
+        "Crown",
+        "Caries",
+        "Periodontitis"
       ]
     },
     {
@@ -65,7 +67,8 @@
       "areLabelsMutuallyExclusive": false,
       "areLabelsUniqueOnImage": false,
       "labels": [
-        "?"
+        "?",
+        "e95"
       ]
     }
   ]
