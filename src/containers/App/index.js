@@ -256,12 +256,12 @@ class App extends Component {
 
     const history = this.props.image.history || {};
 
+    const timestamp = moment.utc().format('MM-DD-YYYY-h:mm:ss-a');
     if (prevBoxes.length > 0) {
-      const timestamp = new Date().valueOf();
-
       history[timestamp] = prevBoxes;
+    } else {
+      history[timestamp] = currentBoxes;
     }
-
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
       {
@@ -273,18 +273,15 @@ class App extends Component {
         this.getAllData();
         this.setState({ isSaved: true });
 
-        setTimeout(
-          () => {
-            this.setState({
-              isSaving: false,
-              isSaved: false,
-              isCurrentImageClean: true
-            });
+        setTimeout(() => {
+          this.setState({
+            isSaving: false,
+            isSaved: false,
+            isCurrentImageClean: true
+          });
 
-            this.props.action.loadImage(currentBoxes, history);
-          },
-          FLASH_ALERT_ONSCREEN_TIME
-        );
+          this.props.action.loadImage(currentBoxes, history);
+        }, FLASH_ALERT_ONSCREEN_TIME);
       }
     );
   }
