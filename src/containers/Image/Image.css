@@ -48,6 +48,7 @@
 
 .Image__Box.clicked {
   z-index: 999;
+  opacity: 1;
 }
 
 .Image__Box__Resizer {
@@ -157,4 +158,12 @@
 .Image__Box--moving .Image__Box__ShowLabels,
 .Image__Box--resizing .Image__Box__ShowLabels {
   display: none !important;
+}
+
+.hidden .Image__Box {
+  opacity: 0;
+}
+
+.hidden .Image__Box:hover, .hidden .Image__Box.clicked{
+  opacity: 1;
 }
