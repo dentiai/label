@@ -250,24 +250,19 @@ class App extends Component {
     }
 
     this.setState({ isSaving: true });
-
     const currentBoxes = this.props.image.boxes;
     const prevBoxes = this.props.image.prevBoxes;
 
     const history = this.props.image.history || {};
-
     const timestamp = moment.utc().format('MM-DD-YYYY-h:mm:ss-a');
-    if (prevBoxes.length > 0) {
-      history[timestamp] = prevBoxes;
-    } else {
-      history[timestamp] = currentBoxes;
-    }
+    history[timestamp] = currentBoxes;
+
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
       {
         currentBoxes,
         history,
-        lastUpdate: moment.utc().format('MMMM Do YYYY, h:mm:ss a')
+        lastUpdate: timestamp
       },
       () => {
         this.getAllData();
