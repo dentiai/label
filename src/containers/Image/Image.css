@@ -39,9 +39,16 @@
   border: 1px solid #60E4FF;
 }
 .Image__Box:hover,
+.Image__Box.clicked,
 .Image__Box--Editing {
   border-color: #60E4FF;
   cursor: move;
+  z-index: 99;
+}
+
+.Image__Box.clicked {
+  z-index: 999;
+  opacity: 1;
 }
 
 .Image__Box__Resizer {
@@ -54,7 +61,7 @@
   border-radius: 50%;
   box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
-.Image__Box:hover .Image__Box__Resizer,
+.Image__Box:hover .Image__Box__Resizer, .Image__Box.clicked .Image__Box__Resizer
 .Image__Box--resizing .Image__Box__Resizer {
   display: block;
 }
@@ -94,7 +101,7 @@
   border-radius: 50%;
   box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
-.Image__Box:hover .Image__Box__DeleteButton {
+.Image__Box:hover .Image__Box__DeleteButton, .Image__Box.clicked .Image__Box__Resizer {
   display: flex;
 }
 .Image__Box--moving .Image__Box__DeleteButton,
@@ -132,7 +139,7 @@
   cursor: pointer;
   box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 0.2);
 }
-.Image__Box:hover .Image__Box__AddEditButton {
+.Image__Box:hover .Image__Box__AddEditButton, .Image__Box.clicked .Image__Box__AddEditButton{
   display: flex;
 }
 .Image__Box--moving .Image__Box__AddEditButton,
@@ -145,7 +152,7 @@
   display: none;
   max-height: inherit;
 }
-.Image__Box:hover .Image__Box__ShowLabels {
+.Image__Box:hover .Image__Box__ShowLabels, .Image__Box.clicked .Image__Box__ShowLabels{
   display: block;
 }
 .Image__Box--moving .Image__Box__ShowLabels,
@@ -157,6 +164,6 @@
   opacity: 0;
 }
 
-.hidden .Image__Box:hover {
+.hidden .Image__Box:hover, .hidden .Image__Box.clicked{
   opacity: 1;
 }
