@@ -17,24 +17,6 @@ export const qs = (function(a) {
   return b;
 })(window.location.search.substr(1).split('&'));
 
-const someJson = [
-  {
-    labels: [
-      {
-        labels: ['1', '2']
-      }
-    ],
-    url: 'url'
-  },
-  {
-    labels: [
-      {
-        labels: ['1', '2']
-      }
-    ],
-    url: 'url'
-  }
-];
 export const findLabel = (obj, val) => {
   if (_.isArray(obj)) {
     for (let label of obj) {

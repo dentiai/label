@@ -56,6 +56,13 @@
   margin-right: 10px;
 }
 
+.App__Input {
+  background-color: rgba(255, 255, 255, 0.14);
+  border: 1px solid #8c8c8c;
+  margin-right: 5px;
+  padding: 5px;
+}
+
 .App__Button {
   box-sizing: border-box;
   width: 8em;
@@ -109,5 +116,4 @@
 }
 .DateInput__display-text--has-input {
   color: #fff;
-  margin-top: 85px;
 }

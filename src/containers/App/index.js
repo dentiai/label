@@ -72,25 +72,40 @@ class App extends Component {
 
   componentDidMount = () => {
     this.getAllData();
-    console.log('this.allData', this.allData);
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
       this.props.action.loadLabelConfig(config);
     });
 
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   };
-
-  filterByLabel = () => {
+  setFilters = () => {
+    const parsedFromDate = this.state.startDate
+      ? moment(this.state.startDate).unix()
+      : 0;
+    const parsedToDate = this.state.endDate
+      ? moment(this.state.endDate).unix()
+      : 9993737837;
     const filtered = [];
     for (let id of this.allData) {
-      if (findLabel(id, 'Crown')) {
+      const lastUpdate = moment(id.lastUpdate).unix() || moment().unix();
+      const filtredByText = this.state.filterText
+        ? findLabel(id, this.state.filterText)
+        : true;
+      if (
+        filtredByText &&
+        lastUpdate >= parsedFromDate &&
+        lastUpdate <= parsedToDate
+      ) {
         filtered.push(id.url);
       }
     }
     this.setState({ filtered });
   };
+  handleInput = value => {
+    this.setState({ filterText: value });
+  };
   clearFiltering = () => {
-    //
+    this.setState({ filtered: this.mainList, filterText: '' });
   };
   getAllData = () => {
     getBucketImageList(response => {
@@ -100,20 +115,11 @@ class App extends Component {
       this.list = this.mainList;
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
       this.setAndCheckImageAtIndex(idx, false);
-      this.getMinAndMaxValues(response.bucketContents);
       this.setState({ bucketContents: response.bucketContents });
       this.getAllImageData(this.mainList);
     });
   };
   getImagesWithLabel(o, id) {}
-  getMinAndMaxValues(val) {
-    console.log('val', val);
-    // let arr = Object.values(val.LastModified);
-    // let min = Math.min(...arr.LastModified);
-    // console.log('arr', arr);
-    // let max = Math.max(...arr.LastModified);
-    // this.setState({ startDate: min, endDate: max });
-  }
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
       return this.list.indexOf(val);
@@ -282,7 +288,7 @@ class App extends Component {
           this.allData.push({
             url,
             labels: data.currentBoxes,
-            lastUpdate: data.lastUpdate
+            lastUpdate: moment(data.lastUpdate, 'MM-DD-YYYY-h:mm:ss-a').unix()
           });
         },
         error => {
@@ -447,15 +453,29 @@ class App extends Component {
                 this.setState({ startDate, endDate })}
               focusedInput={this.state.focusedInput}
               onFocusChange={focusedInput => this.setState({ focusedInput })}
+              enableOutsideDays
+              isOutsideRange={() => null}
             />
           </div>
           <div>
-            <input type="text" />
+            <input
+              type="text"
+              onChange={e => this.handleInput(e.target.value)}
+              value={this.state.filterText}
+              placeholder="filter by label name"
+              className="App__Input"
+            />
             <button
-              onClick={() => this.filterByLabel()}
+              onClick={() => this.setFilters()}
               className="App__Button App__Button--small App__Button--Primary"
             >
               filter
+            </button>
+            <button
+              onClick={() => this.clearFiltering()}
+              className="App__Button App__Button--small App__Button--Danger"
+            >
+              clear
             </button>
           </div>
           <div>{this.jsonList.length}/{this.mainList.length}</div>
