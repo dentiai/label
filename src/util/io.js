@@ -13,7 +13,7 @@ const extractImageListFromBucket = bucket => {
   const jsonList = [];
   const nameList = [];
   const bucketContents = bucket.ListBucketResult.Contents;
-
+  console.log('bucketContents', bucketContents);
   bucketContents.forEach(object => {
     const fileName = object.Key[0];
 
@@ -27,7 +27,7 @@ const extractImageListFromBucket = bucket => {
     }
   });
 
-  return { list, jsonList, nameList, bucketContents };
+  return { list, jsonList, nameList };
 };
 
 /**
@@ -77,7 +77,6 @@ export const getBucketImageList = onListReady => {
  */
 export const uploadJSONToBucket = (fileName, json, onUploaded) => {
   const fileContents = JSON.stringify(json);
-
   const blob = new Blob([fileContents], { type: 'application/json' });
 
   axios

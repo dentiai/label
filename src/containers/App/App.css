@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 85px;
+  height: 95px;
   padding: 9px 0;
   text-align: center;
   background-color: #222;
@@ -68,6 +68,12 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.App__Button--small {
+  width: inherit;
+  height: inherit;
+}
+
 .App__Button + .App__Button {
   margin-left: 10px;
 }
@@ -87,7 +93,7 @@
 }
 
 .App__Image {
-  margin-top: 52px;
+  margin-top: 95px;
 }
 .DateRangePickerInput {
   border: 0;

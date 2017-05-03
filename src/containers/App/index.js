@@ -31,6 +31,8 @@ import {
 import { connect } from 'react-redux';
 import './App.css';
 
+import { findLabel } from '../../util/helpers';
+
 const direction = {
   forward: 'forward',
   backward: 'backward'
@@ -56,6 +58,7 @@ class App extends Component {
       prevImageUrl: null,
       showLabels: true,
       bucketContents: {},
+      filtered: [],
       paramsPhotoId
     };
 
@@ -63,11 +66,12 @@ class App extends Component {
     this.jsonList = [];
     this.notLabelledList = [];
     this.list = [];
+    this.allData = [];
   }
 
   componentDidMount = () => {
     this.getAllData();
-
+    console.log('this.allData', this.allData);
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
       this.props.action.loadLabelConfig(config);
     });
@@ -75,6 +79,18 @@ class App extends Component {
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   };
 
+  filterByLabel = () => {
+    const filtered = [];
+    for (let id of this.allData) {
+      if (findLabel(id, 'Crown')) {
+        filtered.push(id.url);
+      }
+    }
+    this.setState({ filtered });
+  };
+  clearFiltering = () => {
+    //
+  };
   getAllData = () => {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
@@ -85,13 +101,15 @@ class App extends Component {
       this.setAndCheckImageAtIndex(idx, false);
       this.getMinAndMaxValues(response.bucketContents);
       this.setState({ bucketContents: response.bucketContents });
+      this.getAllImageData(this.mainList);
     });
   };
+  getImagesWithLabel(o, id) {}
   getMinAndMaxValues(val) {
     console.log('val', val);
-    let arr = Object.values(val.LastModified);
+    // let arr = Object.values(val.LastModified);
     // let min = Math.min(...arr.LastModified);
-    console.log('arr', arr);
+    // console.log('arr', arr);
     // let max = Math.max(...arr.LastModified);
     // this.setState({ startDate: min, endDate: max });
   }
@@ -117,6 +135,9 @@ class App extends Component {
     if (nextState.showLabelled !== this.state.showLabelled) {
       this.toggleImages();
     }
+    if (nextState.filtered !== this.state.filtered) {
+      this.filtredImages(nextState.filtered);
+    }
   }
   toggleImages() {
     if (!this.state.showLabelled) {
@@ -124,6 +145,12 @@ class App extends Component {
     } else {
       this.list = this.mainList;
     }
+    this.props.history.push('/');
+    this.setAndCheckImageAtIndex(0, false);
+  }
+
+  filtredImages(data) {
+    this.list = data;
     this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
   }
@@ -246,7 +273,23 @@ class App extends Component {
 
     return nextIndex;
   }
-
+  getAllImageData(list) {
+    for (let url of list) {
+      downloadJSONFromBucket(
+        this.getJSONFileNameForImage(url),
+        data => {
+          this.allData.push({
+            url,
+            labels: data.currentBoxes,
+            lastUpdate: data.lastUpdate
+          });
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    }
+  }
   loadImageBoxes(url) {
     downloadJSONFromBucket(
       this.getJSONFileNameForImage(url),
@@ -396,7 +439,7 @@ class App extends Component {
 
           </button>
           <div>
-            <small>filter labelled by date: </small>
+            <small>filter by date: </small>
             <DateRangePicker
               startDate={this.state.startDate}
               endDate={this.state.endDate}
@@ -405,6 +448,15 @@ class App extends Component {
               focusedInput={this.state.focusedInput}
               onFocusChange={focusedInput => this.setState({ focusedInput })}
             />
+          </div>
+          <div>
+            <input type="text" />
+            <button
+              onClick={() => this.filterByLabel()}
+              className="App__Button App__Button--small App__Button--Primary"
+            >
+              filter
+            </button>
           </div>
           <div>{this.jsonList.length}/{this.mainList.length}</div>
           <button
