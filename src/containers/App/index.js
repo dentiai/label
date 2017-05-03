@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import moment from 'moment';
+
 import { Link, Redirect } from 'react-router-dom';
 import {
   DateRangePicker,
@@ -42,7 +44,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     let paramsPhotoId = '';
-
     if (props.match.params.photoId) paramsPhotoId = props.match.params.photoId;
     this.state = {
       currentImageUrl: null,
@@ -310,21 +311,20 @@ class App extends Component {
     }
 
     this.setState({ isSaving: true });
-
     const currentBoxes = this.props.image.boxes;
     const prevBoxes = this.props.image.prevBoxes;
 
     const history = this.props.image.history || {};
-
-    if (prevBoxes.length > 0) {
-      const timestamp = new Date().valueOf();
-
-      history[timestamp] = prevBoxes;
-    }
+    const timestamp = moment.utc().format('MM-DD-YYYY-h:mm:ss-a');
+    history[timestamp] = currentBoxes;
 
     uploadJSONToBucket(
       this.getJSONFileNameForImage(this.state.currentImageUrl),
-      { currentBoxes, history },
+      {
+        currentBoxes,
+        history,
+        lastUpdate: timestamp
+      },
       () => {
         this.getAllData();
         this.setState({ isSaved: true });

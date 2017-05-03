@@ -112,7 +112,7 @@ class Labels extends Component {
   render() {
     return (
       <div
-          className={"EditLabels"}
+        className={"EditLabels"}
           onMouseDown={e => e.stopPropagation()}
           onMouseMove={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
