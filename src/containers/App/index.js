@@ -3,11 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 import { Link, Redirect } from 'react-router-dom';
-import {
-  DateRangePicker,
-  SingleDatePicker,
-  DayPickerRangeController
-} from 'react-dates';
+import { DateRangePicker } from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';
 
@@ -318,7 +314,6 @@ class App extends Component {
 
     this.setState({ isSaving: true });
     const currentBoxes = this.props.image.boxes;
-    const prevBoxes = this.props.image.prevBoxes;
 
     const history = this.props.image.history || {};
     const timestamp = moment.utc().format('MM-DD-YYYY-h:mm:ss-a');
