@@ -54,6 +54,7 @@ class App extends Component {
       nextImageUrl: null,
       prevImageUrl: null,
       showLabels: true,
+      filterText: '',
       bucketContents: {},
       filtered: [],
       paramsPhotoId

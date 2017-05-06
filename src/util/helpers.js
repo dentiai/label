@@ -18,13 +18,18 @@ export const qs = (function(a) {
 })(window.location.search.substr(1).split('&'));
 
 export const findLabel = (obj, val) => {
-  if (_.isArray(obj)) {
-    for (let label of obj) {
-      return findLabel(label, val);
+  let datas = false;
+  function filtering(o, v) {
+    if (_.isArray(o)) {
+      o.forEach(label => {
+        return filtering(label, v);
+      });
+    } else if (_.isObject(o)) {
+      return filtering(o.labels, v);
+    } else if (o === v) {
+      datas = true;
     }
-  } else if (_.isObject(obj)) {
-    return findLabel(obj.labels, val);
-  } else {
-    return obj === val;
   }
+  filtering(obj, val);
+  return datas;
 };

@@ -13,7 +13,6 @@ const extractImageListFromBucket = bucket => {
   const jsonList = [];
   const nameList = [];
   const bucketContents = bucket.ListBucketResult.Contents;
-  console.log('bucketContents', bucketContents);
   bucketContents.forEach(object => {
     const fileName = object.Key[0];
 
