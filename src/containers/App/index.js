@@ -3,6 +3,9 @@ import axios from 'axios';
 import moment from 'moment';
 
 import { Link, Redirect } from 'react-router-dom';
+import { DateRangePicker } from 'react-dates';
+
+import 'react-dates/lib/css/_datepicker.css';
 
 import Image from '../Image';
 import Modal from 'simple-react-modal';
@@ -25,6 +28,8 @@ import {
 } from '../../actions';
 import { connect } from 'react-redux';
 import './App.css';
+
+import { findLabel } from '../../util/helpers';
 
 const direction = {
   forward: 'forward',
@@ -49,6 +54,9 @@ class App extends Component {
       nextImageUrl: null,
       prevImageUrl: null,
       showLabels: true,
+      filterText: '',
+      bucketContents: {},
+      filtered: [],
       paramsPhotoId
     };
 
@@ -56,18 +64,46 @@ class App extends Component {
     this.jsonList = [];
     this.notLabelledList = [];
     this.list = [];
+    this.allData = [];
   }
 
   componentDidMount = () => {
     this.getAllData();
-
     downloadJSONFromBucket(LABEL_CONFIG_FILE_URL, config => {
       this.props.action.loadLabelConfig(config);
     });
 
     setInterval(() => this.tick(), CHECK_IMAGE_DIRTY_INTERVAL);
   };
-
+  setFilters = () => {
+    const parsedFromDate = this.state.startDate
+      ? moment(this.state.startDate).unix()
+      : 0;
+    const parsedToDate = this.state.endDate
+      ? moment(this.state.endDate).unix()
+      : 9993737837;
+    const filtered = [];
+    for (let id of this.allData) {
+      const lastUpdate = moment(id.lastUpdate).unix() || moment().unix();
+      const filtredByText = this.state.filterText
+        ? findLabel(id, this.state.filterText)
+        : true;
+      if (
+        filtredByText &&
+        lastUpdate >= parsedFromDate &&
+        lastUpdate <= parsedToDate
+      ) {
+        filtered.push(id.url);
+      }
+    }
+    this.setState({ filtered });
+  };
+  handleInput = value => {
+    this.setState({ filterText: value });
+  };
+  clearFiltering = () => {
+    this.setState({ filtered: this.mainList, filterText: '' });
+  };
   getAllData = () => {
     getBucketImageList(response => {
       this.jsonList = response.jsonList;
@@ -76,8 +112,11 @@ class App extends Component {
       this.list = this.mainList;
       const idx = this.findIndexOfCurrentPhoto(this.state.paramsPhotoId);
       this.setAndCheckImageAtIndex(idx, false);
+      this.setState({ bucketContents: response.bucketContents });
+      this.getAllImageData(this.mainList);
     });
   };
+  getImagesWithLabel(o, id) {}
   findIndexOfCurrentPhoto = val => {
     if (this.list && val) {
       return this.list.indexOf(val);
@@ -100,6 +139,9 @@ class App extends Component {
     if (nextState.showLabelled !== this.state.showLabelled) {
       this.toggleImages();
     }
+    if (nextState.filtered !== this.state.filtered) {
+      this.filtredImages(nextState.filtered);
+    }
   }
   toggleImages() {
     if (!this.state.showLabelled) {
@@ -107,6 +149,12 @@ class App extends Component {
     } else {
       this.list = this.mainList;
     }
+    this.props.history.push('/');
+    this.setAndCheckImageAtIndex(0, false);
+  }
+
+  filtredImages(data) {
+    this.list = data;
     this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
   }
@@ -229,7 +277,23 @@ class App extends Component {
 
     return nextIndex;
   }
-
+  getAllImageData(list) {
+    for (let url of list) {
+      downloadJSONFromBucket(
+        this.getJSONFileNameForImage(url),
+        data => {
+          this.allData.push({
+            url,
+            labels: data.currentBoxes,
+            lastUpdate: moment(data.lastUpdate, 'MM-DD-YYYY-h:mm:ss-a').unix()
+          });
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    }
+  }
   loadImageBoxes(url) {
     downloadJSONFromBucket(
       this.getJSONFileNameForImage(url),
@@ -251,7 +315,6 @@ class App extends Component {
 
     this.setState({ isSaving: true });
     const currentBoxes = this.props.image.boxes;
-    const prevBoxes = this.props.image.prevBoxes;
 
     const history = this.props.image.history || {};
     const timestamp = moment.utc().format('MM-DD-YYYY-h:mm:ss-a');
@@ -377,6 +440,40 @@ class App extends Component {
             {!this.state.showLabelled ? 'Show Not Labelled' : 'Show Labelled'}
 
           </button>
+          <div>
+            <small>filter by date: </small>
+            <DateRangePicker
+              startDate={this.state.startDate}
+              endDate={this.state.endDate}
+              onDatesChange={({ startDate, endDate }) =>
+                this.setState({ startDate, endDate })}
+              focusedInput={this.state.focusedInput}
+              onFocusChange={focusedInput => this.setState({ focusedInput })}
+              enableOutsideDays
+              isOutsideRange={() => null}
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              onChange={e => this.handleInput(e.target.value)}
+              value={this.state.filterText}
+              placeholder="filter by label name"
+              className="App__Input"
+            />
+            <button
+              onClick={() => this.setFilters()}
+              className="App__Button App__Button--small App__Button--Primary"
+            >
+              filter
+            </button>
+            <button
+              onClick={() => this.clearFiltering()}
+              className="App__Button App__Button--small App__Button--Danger"
+            >
+              clear
+            </button>
+          </div>
           <div>{this.jsonList.length}/{this.mainList.length}</div>
           <button
             className="App__Button App__Button--Primary"

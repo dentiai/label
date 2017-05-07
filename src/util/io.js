@@ -13,7 +13,6 @@ const extractImageListFromBucket = bucket => {
   const jsonList = [];
   const nameList = [];
   const bucketContents = bucket.ListBucketResult.Contents;
-
   bucketContents.forEach(object => {
     const fileName = object.Key[0];
 
@@ -38,7 +37,8 @@ const extractImageListFromBucket = bucket => {
  */
 const getAbsoluteFileUrlFromFileName = fileName => {
   if (
-    fileName === LABEL_CONFIG_FILE_URL || fileName.startsWith(S3_BUCKET_URL)
+    fileName === LABEL_CONFIG_FILE_URL ||
+    fileName.startsWith(S3_BUCKET_URL)
   ) {
     return fileName;
   } else {
@@ -76,7 +76,6 @@ export const getBucketImageList = onListReady => {
  */
 export const uploadJSONToBucket = (fileName, json, onUploaded) => {
   const fileContents = JSON.stringify(json);
-
   const blob = new Blob([fileContents], { type: 'application/json' });
 
   axios
@@ -105,6 +104,6 @@ export const downloadJSONFromBucket = (fileName, onDownloaded, onError) => {
     )
     .catch(
       error =>
-        typeof onError === 'function' ? onError(error) : console.log(error)
+        (typeof onError === 'function' ? onError(error) : console.log(error))
     );
 };
