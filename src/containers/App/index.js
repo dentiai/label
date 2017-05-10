@@ -140,7 +140,7 @@ class App extends Component {
       this.toggleImages();
     }
     if (nextState.filtered !== this.state.filtered) {
-      this.filtredImages(nextState.filtered);
+      this.filteredImages(nextState.filtered);
     }
   }
   toggleImages() {
@@ -153,7 +153,7 @@ class App extends Component {
     this.setAndCheckImageAtIndex(0, false);
   }
 
-  filtredImages(data) {
+  filteredImages(data) {
     this.list = data;
     this.props.history.push('/');
     this.setAndCheckImageAtIndex(0, false);
@@ -197,12 +197,12 @@ class App extends Component {
 
     const currentImageUrl = `${S3_BUCKET_URL}/${this.list[index]}`;
 
-    const prevImageUrl = this.list[
+    const prevImageUrl = `${S3_BUCKET_URL}/${this.list[
       this.getNextImageIndexGoingIn(direction.backward, index)
-    ];
-    const nextImageUrl = this.list[
+    ]}`;
+    const nextImageUrl = `${S3_BUCKET_URL}/${this.list[
       this.getNextImageIndexGoingIn(direction.forward, index)
-    ];
+    ]}`;
     this.setState({
       currentImageIndex: index,
       currentImageUrl,
