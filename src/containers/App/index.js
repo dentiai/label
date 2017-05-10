@@ -134,7 +134,10 @@ class App extends Component {
     if (nextProps.match.params.photoId !== this.props.match.params.photoId) {
       const idx = this.findIndexOfCurrentPhoto(nextProps.match.params.photoId);
       this.setAndCheckImageAtIndex(idx, false);
-      this.setState({ currentImageIndex: idx });
+      this.setState({
+        currentImageIndex: idx,
+        paramsPhotoId: nextProps.match.params.photoId
+      });
     }
     if (nextState.showLabelled !== this.state.showLabelled) {
       this.toggleImages();
