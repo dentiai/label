@@ -318,16 +318,17 @@ class Image extends Component {
     return (
       <div
         className={
-          `Image__Box number-${index} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
+          `${this.props.freezeLabels ? 'freeze' : ''} Image__Box number-${index} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
             (index === this.editingBoxIndex
               ? `Image__Box--${this.drawState}`
               : '')
         }
         key={index}
-        onClick={() => this.toggleImageClass(index)}
-        onMouseDown={e => this.onMouseDownOnBox(e, index)}
-        onMouseMove={e => this.onMouseMoveOnBox(e)}
-        onMouseUp={e => this.onMouseUpFromBox(e)}
+        onClick={() => !this.props.freezeLabels && this.toggleImageClass(index)}
+        onMouseDown={e =>
+          !this.props.freezeLabels && this.onMouseDownOnBox(e, index)}
+        onMouseMove={e => !this.props.freezeLabels && this.onMouseMoveOnBox(e)}
+        onMouseUp={e => !this.props.freezeLabels && this.onMouseUpFromBox(e)}
         style={boxStyle}
       >
         <div

@@ -200,12 +200,8 @@ class App extends Component {
 
     const currentImageUrl = `${S3_BUCKET_URL}/${this.list[index]}`;
 
-    const prevImageUrl = `${S3_BUCKET_URL}/${this.list[
-      this.getNextImageIndexGoingIn(direction.backward, index)
-    ]}`;
-    const nextImageUrl = `${S3_BUCKET_URL}/${this.list[
-      this.getNextImageIndexGoingIn(direction.forward, index)
-    ]}`;
+    const prevImageUrl = `${S3_BUCKET_URL}/${this.list[this.getNextImageIndexGoingIn(direction.backward, index)]}`;
+    const nextImageUrl = `${S3_BUCKET_URL}/${this.list[this.getNextImageIndexGoingIn(direction.forward, index)]}`;
     this.setState({
       currentImageIndex: index,
       currentImageUrl,
@@ -443,6 +439,18 @@ class App extends Component {
             {!this.state.showLabelled ? 'Show Not Labelled' : 'Show Labelled'}
 
           </button>
+          <div className="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                onChange={() =>
+                  this.setState(prevState => ({
+                    freezeLabels: !prevState.freezeLabels
+                  }))}
+              />
+              <small>Freeze labels</small>
+            </label>
+          </div>
           <div>
             <small>filter by date: </small>
             <DateRangePicker
@@ -504,6 +512,7 @@ class App extends Component {
               url={this.state.currentImageUrl}
               error={this.state.hasErroredOnLoad}
               showLabels={this.state.showLabels}
+              freezeLabels={this.state.freezeLabels}
             />}
         </div>
 
