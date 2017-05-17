@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import _ from 'underscore';
 import {
   drawNewBox,
   addNewBox,
@@ -38,7 +39,7 @@ class Image extends Component {
 
     this.mouseBoxDeltaX = 0;
     this.mouseBoxDeltaY = 0;
-
+    this.labelList = [];
     this.state = {
       isEditingLabelsForBoxIndex: null
     };
@@ -62,12 +63,37 @@ class Image extends Component {
     this.drawState = drawState.drawing;
   }
 
+  setActiveLabel = mouseCoordinates => {
+    const indexesOfHoveredLabel = _.filter(
+      this.labelList,
+      item =>
+        item.startX <= mouseCoordinates.x &&
+        item.endX >= mouseCoordinates.x &&
+        item.startY <= mouseCoordinates.y &&
+        item.endY >= mouseCoordinates.y
+    );
+    const currentActiveLabel = () => {
+      if (indexesOfHoveredLabel.length > 0) {
+        return indexesOfHoveredLabel.reduce((prev, curr) => {
+          return Math.abs(curr.centerPointX - mouseCoordinates.x) <
+            Math.abs(prev.centerPointX - mouseCoordinates.x) &&
+            Math.abs(curr.centerPointY - mouseCoordinates.y) <
+              Math.abs(prev.centerPointY - mouseCoordinates.y)
+            ? curr
+            : prev;
+        }).id;
+      }
+    };
+    if (this.state.singleActiveLabel !== currentActiveLabel())
+      this.setState({ singleActiveLabel: currentActiveLabel() });
+  };
   onMouseMoveOnImage(event) {
     if (this.props.error) {
       return;
     }
 
     const mouseCoordinates = this.getImageMouseCoordinatesFromMouseEvent(event);
+    this.setActiveLabel(mouseCoordinates);
 
     switch (this.drawState) {
       case drawState.drawing:
@@ -318,7 +344,7 @@ class Image extends Component {
     return (
       <div
         className={
-          `${this.props.freezeLabels ? 'freeze' : ''} Image__Box number-${index} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
+          `${this.props.freezeLabels ? 'freeze' : ''} Image__Box number-${index} ${this.state.singleActiveLabel === index ? 'Image__Box-active' : ''} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
             (index === this.editingBoxIndex
               ? `Image__Box--${this.drawState}`
               : '')
@@ -393,7 +419,14 @@ class Image extends Component {
       </p>
     );
   }
-
+  componentWillUpdate(nextProps) {
+    this.labelList = Array.from(nextProps.image.boxes).map((item, index) => ({
+      ...item,
+      id: index,
+      centerPointX: (item.endX + item.startX) / 2,
+      centerPointY: (item.startY + item.endY) / 2
+    }));
+  }
   render() {
     return (
       <div
