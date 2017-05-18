@@ -448,7 +448,7 @@ class App extends Component {
                     freezeLabels: !prevState.freezeLabels
                   }))}
               />
-              <small>Freeze labels</small>
+              <small>Freeze Boxes</small>
             </label>
           </div>
           <div>

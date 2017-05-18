@@ -345,9 +345,9 @@ class Image extends Component {
       <div
         className={
           `${this.props.freezeLabels ? 'freeze' : ''} Image__Box number-${index} ${this.state.singleActiveLabel === index ? 'Image__Box-active' : ''} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
-            (index === this.editingBoxIndex
+          (index === this.editingBoxIndex
               ? `Image__Box--${this.drawState}`
-              : '')
+          : '')
         }
         key={index}
         onClick={() => !this.props.freezeLabels && this.toggleImageClass(index)}
