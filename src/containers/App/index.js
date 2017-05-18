@@ -200,12 +200,8 @@ class App extends Component {
 
     const currentImageUrl = `${S3_BUCKET_URL}/${this.list[index]}`;
 
-    const prevImageUrl = `${S3_BUCKET_URL}/${this.list[
-      this.getNextImageIndexGoingIn(direction.backward, index)
-    ]}`;
-    const nextImageUrl = `${S3_BUCKET_URL}/${this.list[
-      this.getNextImageIndexGoingIn(direction.forward, index)
-    ]}`;
+    const prevImageUrl = `${S3_BUCKET_URL}/${this.list[this.getNextImageIndexGoingIn(direction.backward, index)]}`;
+    const nextImageUrl = `${S3_BUCKET_URL}/${this.list[this.getNextImageIndexGoingIn(direction.forward, index)]}`;
     this.setState({
       currentImageIndex: index,
       currentImageUrl,
@@ -432,7 +428,7 @@ class App extends Component {
             </Link>
           </button>
           <button onClick={() => this.toggleLabel()}>
-            Toggle Labels
+            {this.state.showLabels ? 'Hide Labels' : 'Show Labels'}
           </button>
           <button
             onClick={() =>
