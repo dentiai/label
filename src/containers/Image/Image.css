@@ -178,8 +178,7 @@
 
 .freeze.Image__Box:hover .Image__Box__DeleteButton,
 .freeze.Image__Box:hover .ImageBox__Resizers,
-.freeze.Image__Box:hover .Image__Box__AddEditButton,
-.freeze.Image__Box:hover .Image__Box__ShowLabels {
+.freeze.Image__Box:hover .Image__Box__AddEditButton {
   display: none;
 }
 
