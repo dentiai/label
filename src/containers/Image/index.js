@@ -195,14 +195,17 @@ class Image extends Component {
   }
 
   onClickAddEditButton(event, index) {
-    this.setState(prevState => {
-      let isEditingLabelsForBoxIndex = prevState.isEditingLabelsForBoxIndex ===
-        index
-        ? null
-        : index;
+    event.stopPropagation();
+    if (event.nativeEvent.which === 1) {
+      this.setState(prevState => {
+        let isEditingLabelsForBoxIndex = prevState.isEditingLabelsForBoxIndex ===
+          index
+          ? null
+          : index;
 
-      return { isEditingLabelsForBoxIndex };
-    });
+        return { isEditingLabelsForBoxIndex };
+      });
+    }
   }
 
   resizeEditingBoxWithMouseCoordinates(mouseCoordinates) {
@@ -333,6 +336,9 @@ class Image extends Component {
         <div
           className="Image__Box__DeleteButton"
           onClick={e => this.props.action.deleteBoxAtIndex(index)}
+          onMouseDown={e => e.stopPropagation()}
+          onMouseMove={e => e.stopPropagation()}
+          onMouseUp={e => e.stopPropagation()}
         />
 
         {this.renderResizers(index)}
@@ -340,6 +346,9 @@ class Image extends Component {
         <div
           className="Image__Box__AddEditButton"
           onClick={e => this.onClickAddEditButton(e, index)}
+          onMouseDown={e => e.stopPropagation()}
+          onMouseMove={e => e.stopPropagation()}
+          onMouseUp={e => e.stopPropagation()}
         >
           +/-
         </div>
