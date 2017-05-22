@@ -75,12 +75,28 @@ class Image extends Component {
     const currentActiveLabel = () => {
       if (indexesOfHoveredLabel.length > 0) {
         return indexesOfHoveredLabel.reduce((prev, curr) => {
-          return Math.abs(curr.centerPointX - mouseCoordinates.x) <
-            Math.abs(prev.centerPointX - mouseCoordinates.x) &&
-            Math.abs(curr.centerPointY - mouseCoordinates.y) <
-              Math.abs(prev.centerPointY - mouseCoordinates.y)
-            ? curr
-            : prev;
+          if (
+            curr.endX < prev.endX &&
+            curr.endY < prev.endY &&
+            curr.startX > prev.startX &&
+            curr.startY > prev.startY
+          ) {
+            return curr;
+          } else if (
+            curr.endX > prev.endX &&
+            curr.endY > prev.endY &&
+            curr.startX < prev.startX &&
+            curr.startY < prev.startY
+          ) {
+            return prev;
+          } else {
+            return Math.abs(curr.centerPointX - mouseCoordinates.x) <
+              Math.abs(prev.centerPointX - mouseCoordinates.x) &&
+              Math.abs(curr.centerPointY - mouseCoordinates.y) <
+                Math.abs(prev.centerPointY - mouseCoordinates.y)
+              ? curr
+              : prev;
+          }
         }).id;
       }
     };
@@ -345,9 +361,9 @@ class Image extends Component {
       <div
         className={
           `${this.props.freezeLabels ? 'freeze' : ''} Image__Box number-${index} ${this.state.singleActiveLabel === index ? 'Image__Box-active' : ''} ${this.state.clikedImage === index ? 'clicked' : ''} ${additionalClassName} ` +
-          (index === this.editingBoxIndex
+            (index === this.editingBoxIndex
               ? `Image__Box--${this.drawState}`
-          : '')
+              : '')
         }
         key={index}
         onClick={() => !this.props.freezeLabels && this.toggleImageClass(index)}
