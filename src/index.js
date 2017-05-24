@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import rootReducer from './reducers';
 import App from './containers/App';
 import './index.css';
+import 'babel-polyfill';
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 

@@ -47,7 +47,7 @@
 }
 
 .Image__Box.clicked {
-  z-index: 999;
+  z-index: 99999;
   opacity: 1;
 }
 
@@ -166,4 +166,22 @@
 
 .hidden .Image__Box:hover, .hidden .Image__Box.clicked{
   opacity: 1;
+}
+
+.freeze.Image__Box:hover ,
+.freeze.Image__Box.clicked ,
+.freeze.Image__Box--Editing {
+  border-color: rgba(0, 0, 0, 0.3);
+  cursor: default;
+  z-index: 99;
+}
+
+.freeze.Image__Box:hover .Image__Box__DeleteButton,
+.freeze.Image__Box:hover .ImageBox__Resizers,
+.freeze.Image__Box:hover .Image__Box__AddEditButton {
+  display: none;
+}
+
+.Image__Box-active {
+  z-index: 999;
 }

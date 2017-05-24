@@ -439,6 +439,18 @@ class App extends Component {
             {!this.state.showLabelled ? 'Show Not Labelled' : 'Show Labelled'}
 
           </button>
+          <div className="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                onChange={() =>
+                  this.setState(prevState => ({
+                    freezeLabels: !prevState.freezeLabels
+                  }))}
+              />
+              <small>Freeze Boxes</small>
+            </label>
+          </div>
           <div>
             <small>filter by date: </small>
             <DateRangePicker
@@ -500,6 +512,7 @@ class App extends Component {
               url={this.state.currentImageUrl}
               error={this.state.hasErroredOnLoad}
               showLabels={this.state.showLabels}
+              freezeLabels={this.state.freezeLabels}
             />}
         </div>
 
