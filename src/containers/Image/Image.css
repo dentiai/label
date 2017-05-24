@@ -47,7 +47,7 @@
 }
 
 .Image__Box.clicked {
-  z-index: 999;
+  z-index: 99999;
   opacity: 1;
 }
 
@@ -183,5 +183,5 @@
 }
 
 .Image__Box-active {
-  z-index: 99999999;
+  z-index: 999;
 }
