@@ -428,7 +428,7 @@ class App extends Component {
             </Link>
           </button>
           <button onClick={() => this.toggleLabel()}>
-            Toggle Labels
+            {this.state.showLabels ? 'Hide Labels' : 'Show Labels'}
           </button>
           <button
             onClick={() =>

@@ -80,8 +80,9 @@ export const uploadJSONToBucket = (fileName, json, onUploaded) => {
 
   axios
     .put(getAbsoluteFileUrlFromFileName(fileName), blob, {
-      header: {
-        'Content-Type': 'application/json'
+      headers: {
+        'Content-Type': 'application/json',
+        'x-amz-acl': 'bucket-owner-full-control'
       }
     })
     .then(response => typeof onUploaded === 'function' && onUploaded())
