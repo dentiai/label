@@ -18,6 +18,7 @@ export const qs = (function(a) {
 })(window.location.search.substr(1).split('&'));
 
 export const findLabel = (obj, val) => {
+  console.log(obj);
   let datas = false;
   function filtering(o, v) {
     if (_.isArray(o)) {
@@ -31,5 +32,6 @@ export const findLabel = (obj, val) => {
     }
   }
   filtering(obj, val);
+  console.log(datas);
   return datas;
 };
