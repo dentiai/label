@@ -37,7 +37,12 @@
         "35",
         "36",
         "37",
-        "38"
+        "38",
+        "19",
+        "29",
+        "39",
+        "49",
+        "Mesiodens"
       ]
     },
     {
@@ -47,7 +52,8 @@
       "areLabelsUniqueOnImage": false,
       "labels": [
         "Implant",
-        "Bridge"
+        "Bridge",
+        "Retention"
       ]
     },
     {
@@ -67,8 +73,7 @@
       "areLabelsMutuallyExclusive": false,
       "areLabelsUniqueOnImage": false,
       "labels": [
-        "?",
-        "e95"
+        "?"
       ]
     }
   ]
