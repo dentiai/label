@@ -13,8 +13,8 @@
             },
             "Action": "s3:*",
             "Resource": [
-                "arn:aws:s3:::d-pan1",
-                "arn:aws:s3:::d-pan1/*"
+                "arn:aws:s3:::d-pan",
+                "arn:aws:s3:::d-pan/*"
             ]
         }
     ]
@@ -27,8 +27,8 @@
         "Effect": "Allow",
         "Action": "s3:*",
         "Resource": [
-            "arn:aws:s3:::d-pan1",
-            "arn:aws:s3:::d-pan1/*"
+            "arn:aws:s3:::d-pan",
+            "arn:aws:s3:::d-pan/*"
         ]
     }
 }
