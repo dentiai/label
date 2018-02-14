@@ -485,7 +485,8 @@ class App extends Component {
               clear
             </button>
           </div>
-          <div>{this.jsonList.length}/{this.mainList.length}</div>
+          <div>{this.state.currentImageIndex + 1}/{this.mainList.length}</div>
+          {/*<div>{this.jsonList.length}/{this.mainList.length}</div>*/}
           <button
             className="App__Button App__Button--Primary"
             disabled={this.state.isCurrentImageClean}

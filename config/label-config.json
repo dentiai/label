@@ -63,8 +63,11 @@
       "areLabelsUniqueOnImage": false,
       "labels": [
         "Crown",
+        "Endodontic treatment",
+        "Restoration"
         "Caries",
-        "Periodontitis"
+        "Periodontitis",
+        "Cyst"
       ]
     },
     {

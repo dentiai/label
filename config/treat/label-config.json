@@ -1,0 +1,30 @@
+{
+  "groups": [
+    {
+      "id": "2",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": true,
+      "areLabelsUniqueOnImage": false,
+      "labels": [
+        "Crown",
+        "Implant",
+        "Bridge",
+        "Endodontic treatment",
+        "Restoration"
+        "Retention"
+        "Caries",
+        "Periodontitis",
+        "Cyst"
+      ]
+    },
+    {
+      "id": "99",
+      "isSequential": false,
+      "areLabelsMutuallyExclusive": false,
+      "areLabelsUniqueOnImage": false,
+      "labels": [
+        "?"
+      ]
+    }
+  ]
+}
